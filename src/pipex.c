@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/15 21:01:39 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:38:45 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,9 +120,9 @@ static void	wait_all(pid_t last_process_id, int *status)
 {
 	pid_t	fpid;
 
-	fpid = waitpid(-1, status, WNOHANG);
+	fpid = waitpid(0, status, WNOHANG | WUNTRACED);
 	while (fpid != last_process_id && fpid != -1)
-		fpid = waitpid(-1, status, WNOHANG);
-	while (waitpid(-1, NULL, WNOHANG) >= 0)
+		fpid = waitpid(0, status, WNOHANG | WUNTRACED);
+	while (waitpid(0, NULL, WNOHANG) >= 0)
 		;
 }

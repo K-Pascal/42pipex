@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 11:38:45 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 15:33:56 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ static int	final_cmd(t_data *data, int fd_in)
 	fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd_out == -1)
 	{
-		perror("final_cmd():open()");
+		perror(data->f_out);
 		close(fd_in);
 		exit(EXIT_FAILURE);
 	}

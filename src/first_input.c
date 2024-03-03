@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/15 19:12:16 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 15:34:15 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	choose_input(t_data *data)
 		fd_in = open(data->f_in, O_RDONLY);
 		if (fd_in == -1)
 		{
-			perror("child_process():open()");
+			perror(data->f_in);
 			exit(EXIT_FAILURE);
 		}
 	}

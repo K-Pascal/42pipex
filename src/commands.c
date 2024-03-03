@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/12 18:24:06 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/15 21:08:25 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,39 +18,31 @@
 
 #include "utils.h"
 
-static char	*findpath(char **envp);
+#define ERR_CMD_NOT_FOUND 127
+
+static char	**get_path(char **envp);
+static char	*find_pathenv(char **envp);
 static char	*check_command(char cmd[], char **paths);
 static int	is_valid_command(char arg[]);
 
 int	exec_prog(char **argv, char **envp)
 {
-	char	*path_env;
 	char	**paths;
 	char	*pathname;
 
-	paths = NULL;
-	path_env = findpath(envp);
-	if (path_env)
-	{
-		paths = ft_split(path_env, ':');
-		if (!paths)
-		{
-			perror("exec_prog():ft_split()");
-			return (EXIT_FAILURE);
-		}
-	}
+	paths = get_path(envp);
 	pathname = check_command(argv[0], paths);
 	my_free_all(paths);
 	if (!pathname)
 	{
-		if (ft_strncmp(argv[0], "./", 2))
+		if (!!ft_strncmp(argv[0], "./", 2))
 		{
 			ft_putstr_fd(argv[0], 2);
 			ft_putendl_fd(": command not found", 2);
 		}
 		else
 			perror(argv[0]);
-		return (127);
+		return (ERR_CMD_NOT_FOUND);
 	}
 	execve(pathname, argv, envp);
 	perror(pathname);
@@ -58,7 +50,22 @@ int	exec_prog(char **argv, char **envp)
 	return (EXIT_FAILURE);
 }
 
-static char	*findpath(char **envp)
+static char	**get_path(char **envp)
+{
+	char	*path_env;
+	char	**paths;
+
+	paths = NULL;
+	path_env = find_pathenv(envp);
+	if (path_env == NULL)
+		return (NULL);
+	paths = ft_split(path_env, ':');
+	if (!paths)
+		perror("getpath():ft_split()");
+	return (paths);
+}
+
+static char	*find_pathenv(char **envp)
 {
 	int	i;
 

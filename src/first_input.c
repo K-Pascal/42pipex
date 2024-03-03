@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 15:34:15 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 15:30:49 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,29 +81,23 @@ static void	read_input(t_data *data, int pipefd[2])
 {
 	size_t	len_limiter;
 	char	*input;
-	char	*limiter;
 
 	if (close(pipefd[0]) == -1)
 		perror("read_input():close(pipefd[0])");
-	limiter = ft_strjoin(data->limiter, "\n");
-	if (!limiter)
-	{
-		perror("read_input():ft_strjoin()");
-		close(pipefd[1]);
-		exit(EXIT_FAILURE);
-	}
-	len_limiter = ft_strlen(limiter);
+	len_limiter = ft_strlen(data->limiter);
 	input = ask_input();
-	while (input && !!ft_strncmp(input, limiter, len_limiter))
+	while (input)
 	{
+		if (!ft_strncmp(input, data->limiter, len_limiter)
+			&& input[len_limiter] == '\n')
+			break ;
 		ft_putstr_fd(input, pipefd[1]);
 		free(input);
 		input = ask_input();
 	}
+	free(input);
 	if (close(pipefd[1]) == -1)
 		perror("read_input():close(pipefd[1])");
-	free(input);
-	free(limiter);
 }
 
 static char	*ask_input(void)

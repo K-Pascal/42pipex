@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/11 18:38:06 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/11 18:39:48 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static void	exec_inter_cmds(t_data *data, int pipefd[2])
 			perror("close()");
 		pipefd[0] = fds[0];
 		i++;
-//		waitpid(0, NULL, WNOHANG);
+		waitpid(0, NULL, WNOHANG);
 	}
 }
 

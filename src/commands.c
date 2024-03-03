@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/15 21:08:25 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 12:28:25 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 
 static char	**get_path(char **envp);
 static char	*find_pathenv(char **envp);
-static char	*check_command(char cmd[], char **paths);
-static int	is_valid_command(char arg[]);
+static char	*check_command(char cmd[], char **paths, int mode);
+static int	is_valid_command(char arg[], int mode);
 
 int	exec_prog(char **argv, char **envp)
 {
@@ -31,7 +31,9 @@ int	exec_prog(char **argv, char **envp)
 	char	*pathname;
 
 	paths = get_path(envp);
-	pathname = check_command(argv[0], paths);
+	pathname = check_command(argv[0], paths, F_OK | X_OK);
+	if (!pathname)
+		pathname = check_command(argv[0], paths, F_OK);
 	my_free_all(paths);
 	if (!pathname)
 	{
@@ -81,12 +83,12 @@ static char	*find_pathenv(char **envp)
 	return (NULL);
 }
 
-static char	*check_command(char cmd[], char **paths)
+static char	*check_command(char cmd[], char **paths, int mode)
 {
 	char	*cmd_name;
 	int		i;
 
-	if (is_valid_command(cmd))
+	if (is_valid_command(cmd, mode))
 		return (ft_strdup(cmd));
 	if (paths == NULL)
 		return (NULL);
@@ -97,7 +99,7 @@ static char	*check_command(char cmd[], char **paths)
 	while (paths[i])
 	{
 		cmd = ft_strjoin(paths[i], cmd_name);
-		if (is_valid_command(cmd))
+		if (is_valid_command(cmd, mode))
 		{
 			free(cmd_name);
 			return (cmd);

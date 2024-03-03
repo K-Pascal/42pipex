@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 15:16:22 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/09 16:23:27 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,10 @@ static void	split_process(t_data *data, int pipefd[2])
 		exit(EXIT_FAILURE);
 	}
 	if (fpid == 0)
-		child_process(data, pipefd);
+		parent_process(data, pipefd);
 	else
 	{
-		parent_process(data, pipefd);
 		wait(NULL);
+		child_process(data, pipefd);
 	}
 }

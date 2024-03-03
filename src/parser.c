@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/05 16:26:36 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/08 17:36:34 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ static char	*check_command(char cmd[], char **paths)
 		free(cmd);
 		i++;
 	}
-	perror(&(cmd_name[1]));
+	perror(cmd_name + 1);
 	free(cmd_name);
 	return (NULL);
 }
@@ -83,6 +83,12 @@ static void	verify_list_commands(t_data *data, char **paths, char **argv)
 {
 	int		i;
 
+	data->cmds = malloc(data->nbr_cmds * sizeof(char *));
+	if (!data->cmds)
+	{
+		free_pipex(NULL, paths, NULL, "check_args():malloc()");
+		exit(EXIT_FAILURE);
+	}
 	i = 0;
 	while (i < data->nbr_cmds)
 	{
@@ -90,10 +96,12 @@ static void	verify_list_commands(t_data *data, char **paths, char **argv)
 		if (!data->cmds[i])
 		{
 			my_n_free_all(data->cmds, i);
-			quit_prog(NULL, paths, NULL, EXIT_FAILURE);
+			free_pipex(NULL, paths, NULL, NULL);
+			exit(EXIT_FAILURE);
 		}
 		i++;
 	}
+	my_free_all(paths);
 }
 
 void	check_args(t_data *data, char **argv)
@@ -101,22 +109,26 @@ void	check_args(t_data *data, char **argv)
 	char	*path_env;
 	char	**paths;
 
-	if (data->file_input && access(data->file_input, F_OK | R_OK) == -1)
-		quit_prog(data, NULL, data->file_input, EXIT_FAILURE);
-	if (access(data->file_output, F_OK) != -1
-		&& access(data->file_output, W_OK) == -1)
-		quit_prog(data, NULL, data->file_output, EXIT_FAILURE);
+	if (data->f_in && access(data->f_in, F_OK | R_OK) == -1)
+	{
+		free_pipex(NULL, NULL, NULL, data->f_in);
+		exit(EXIT_FAILURE);
+	}
+	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
+	{
+		free_pipex(NULL, NULL, NULL, data->f_out);
+		exit(EXIT_FAILURE);
+	}
 	paths = NULL;
 	path_env = findpath(data->envp);
 	if (path_env)
 	{
 		paths = ft_split(path_env, ':');
 		if (!paths)
-			quit_prog(data, NULL, "check_args():ft_split()", EXIT_FAILURE);
+		{
+			free_pipex(NULL, NULL, NULL, "check_args():ft_split()");
+			exit(EXIT_FAILURE);
+		}
 	}
-	data->cmds = malloc(data->nbr_cmds * sizeof(char *));
-	if (!data->cmds)
-		quit_prog(data, paths, "check_args():malloc()", EXIT_FAILURE);
 	verify_list_commands(data, paths, argv);
-	my_free_all(paths);
 }

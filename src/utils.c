@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/05 16:20:59 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/08 17:39:18 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,19 @@ void	exec_prog(char const *pathname, char *const argv[], char *const envp[])
 	perror(pathname);
 }
 
-void	quit_prog(t_data *data, char **path, char msg[], int status)
+void	free_pipex(t_data *data, char **path, int fds[2], char msg[])
 {
 	if (msg != NULL)
 		perror(msg);
 	if (data != NULL)
 		my_n_free_all(data->cmds, data->nbr_cmds);
-	my_free_all(path);
-	exit(status);
+	if (path != NULL)
+		my_free_all(path);
+	if (fds != NULL)
+	{
+		close(fds[0]);
+		close(fds[1]);
+	}
 }
 
 void	my_free_all(char **arr)

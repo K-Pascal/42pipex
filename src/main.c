@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/05 16:17:09 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/05 18:38:58 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,6 @@
 #include "gnl/get_next_line.h"
 #include "utils.h"
 #include "parser.h"
-
-#undef BUFFER_SIZE
-#define BUFFER_SIZE 1
 
 #define MSG1 "Usage : ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
 #define MSG2 "Usage : ./pipex here_doc [LIMITER] [cmd 1] [cmd 2] [output file]\n"
@@ -79,7 +76,7 @@ void	parent_process(int pipefd[2], t_data *data)
 		}
 		if (close(pipefd[1]) == -1)
 			perror("parent_process():close()");
-		waitpid(0, NULL, WCONTINUED);
+		wait(NULL);
 	}
 	else
 	{
@@ -131,6 +128,7 @@ int	main(int argc, char **argv, char **envp)
 	int		pipefd[2];
 	t_data	data;
 	int		start;
+	int		i;
 
 	if (argc < 5)
 	{
@@ -153,15 +151,36 @@ int	main(int argc, char **argv, char **envp)
 	if (fpid == 0)
 	{
 		close(pipefd[1]);
+		i = 1;
+		while (i + 1 < data.nbr_cmds)
+		{
+			int	fds[2];
+			pipe(fds);
+			fpid = fork();
+			if (fpid == 0)
+			{
+				close(fds[0]);
+				dup2(pipefd[0], STDIN_FILENO);
+				close(pipefd[0]);
+				dup2(fds[1], STDOUT_FILENO);
+				close(fds[1]);
+				argv = ft_split(data.cmds[i], ' ');
+				exec_prog(argv[0], argv, envp);
+				my_free_all(argv);
+				return (EXIT_FAILURE);
+			}
+			pipefd[0] = fds[0];
+			i++;
+		}
 		dup2(pipefd[0], STDIN_FILENO);
 		close(pipefd[0]);
 		if (data.limiter != NULL)
-			pipefd[1] = open(data.file_output, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+			pipefd[1] = open(data.file_output, O_CREAT | O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		else
 			pipefd[1] = open(data.file_output, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[1]);
-		argv = ft_split(data.cmds[1], ' ');
+		argv = ft_split(data.cmds[i], ' ');
 		exec_prog(argv[0], argv, envp);
 		my_free_all(argv);
 	}
@@ -171,5 +190,5 @@ int	main(int argc, char **argv, char **envp)
 		wait(NULL);
 	}
 	my_n_free_all(data.cmds, data.nbr_cmds);
-	return (EXIT_SUCCESS);
+	return (EXIT_FAILURE);
 }

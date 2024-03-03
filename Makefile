@@ -6,7 +6,7 @@ SRC := $(addprefix $(SRCDIR)/,$(FILES))
 OBJ := $(addprefix $(BUILDDIR)/,$(FILES:.c=.o))
 
 CC := cc
-CFLAGS := -Wall -Wextra -Werror -I.
+CFLAGS := -Wall -Wextra -Werror
 GDB := -g3
 export GDB
 
@@ -23,8 +23,8 @@ NAME := pipex
 .PHONY: all
 all: $(NAME)
 
-$(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(OBJ)
-	$(CC) $(CFLAGS) $(GDB) -o $@ $^ -L $(LIBFTDIR) -l $(LIBFT)
+$(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ)
+	$(CC) $(CFLAGS) $(GDB) -I. -o $@ $^ -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)
 
 $(LIBFTDIR)/$(LIBFTFILE):
 	make -C $(LIBFTDIR)
@@ -34,7 +34,7 @@ $(GNLDIR)/$(GNLFILE):
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p build/
-	$(CC) $(CFLAGS) $(GDB) -c $< -o $@
+	$(CC) $(CFLAGS) $(GDB) -I. -c $< -o $@
 
 .PHONY: clean fclean re norm
 clean:

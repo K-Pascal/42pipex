@@ -80,9 +80,3 @@ norm:
 	make -C $(GNLDIR) norm
 	norminette -R CheckForbiddenSourceHeader $(SRC) $(MANDATORY) $(BONUS)
 	norminette -R CheckDefine inc/
-
-.PHONY: test1
-TEST1 := ./$(NAME) test.txt "cat -e" "head -10" outfile
-test1: $(NAME)
-	@echo $(TEST1)
-	@valgrind --leak-check=full --show-leak-kinds=all --trace-children=yes --track-fds=yes -s --log-fd=2 $(TEST1) ||:

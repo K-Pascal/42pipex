@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 14:46:48 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 13:09:22 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
-static int	is_valid_command(char arg[], int mode);
 
 int	exec_prog(char **argv, char **envp)
 {
@@ -83,7 +82,7 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	char	*cmd_name;
 	int		i;
 
-	if (is_valid_command(cmd, mode))
+	if (access(cmd, mode) != -1)
 		return (ft_strdup(cmd));
 	if (paths == NULL || !ft_strncmp(cmd, "./", 2))
 		return (NULL);
@@ -92,7 +91,7 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	while (paths[i])
 	{
 		cmd = ft_strjoin(paths[i], cmd_name);
-		if (is_valid_command(cmd, mode))
+		if (access(cmd, mode) != -1)
 		{
 			free(cmd_name);
 			return (cmd);
@@ -102,20 +101,4 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	}
 	free(cmd_name);
 	return (NULL);
-}
-
-static int	is_valid_command(char arg[], int mode)
-{
-	int		i;
-	char	temp;
-	int		status;
-
-	i = 0;
-	while (arg[i] && arg[i] != ' ')
-		i++;
-	temp = arg[i];
-	arg[i] = '\0';
-	status = access(arg, mode) != -1;
-	arg[i] = temp;
-	return (status);
 }

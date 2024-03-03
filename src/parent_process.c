@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 18:44:48 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:46:29 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 
 #include "libft/libft.h"
 
-#include "commands.h"
 #include "utils.h"
 
 static void	exec_inter_cmds(t_data *data, int pipefd[2]);
@@ -27,7 +26,6 @@ static void	create_other_process(t_data *data, int i, int pipefd[2], int fd_in);
 void	parent_process(t_data *data, int pipefd[2])
 {
 	int		flags;
-	char	**argv;
 
 	if (close(pipefd[1]) == -1)
 		perror("parent_process():close()");
@@ -50,14 +48,7 @@ void	parent_process(t_data *data, int pipefd[2])
 		exit(EXIT_FAILURE);
 	}
 	redirect_pipefd(pipefd[1], STDOUT_FILENO);
-	argv = ft_split(data->cmds[data->nbr_cmds - 1], ' ');
-	if (!argv)
-	{
-		perror("parent_process():ft_split()");
-		exit(EXIT_FAILURE);
-	}
-	exec_prog(argv, data->envp);
-	my_free_all(argv);
+	prepare_command(data, data->nbr_cmds - 1);
 }
 
 static void	exec_inter_cmds(t_data *data, int pipefd[2])
@@ -81,15 +72,14 @@ static void	exec_inter_cmds(t_data *data, int pipefd[2])
 			perror("close()");
 		pipefd[0] = fds[0];
 		i++;
-		//if (i == data->nbr_cmds)
-		//	wait(NULL);
+		if (i == data->nbr_cmds)
+			wait(NULL);
 	}
 }
 
 static void	create_other_process(t_data *data, int i, int pipefd[2], int fd_in)
 {
 	pid_t	fpid;
-	char	**argv;
 
 	fpid = fork();
 	if (fpid == -1)
@@ -105,13 +95,6 @@ static void	create_other_process(t_data *data, int i, int pipefd[2], int fd_in)
 		perror("create_other_process():close()");
 	redirect_pipefd(fd_in, STDIN_FILENO);
 	redirect_pipefd(pipefd[1], STDOUT_FILENO);
-	argv = ft_split(data->cmds[i], ' ');
-	if (!argv)
-	{
-		perror("create_other_process():ft_split()");
-		exit(EXIT_FAILURE);
-	}
-	exec_prog(argv, data->envp);
-	my_free_all(argv);
+	prepare_command(data, i);
 	exit(EXIT_FAILURE);
 }

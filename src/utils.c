@@ -6,13 +6,18 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 18:50:30 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:00:37 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include "libft/libft.h"
+
+#include "commands.h"
+#include "utils.h"
 
 void	redirect_pipefd(int fd, int newfd)
 {
@@ -48,18 +53,16 @@ void	my_free_all(char **arr)
 	free(arr);
 }
 
-void	my_n_free_all(char **arr, int len)
+void	prepare_command(t_data *data, int i)
 {
-	int	i;
+	char	**argv;
 
-	if (arr == NULL)
-		return ;
-	i = 0;
-	while (i < len)
+	argv = ft_split(data->cmds[i], ' ');
+	if (!argv)
 	{
-		free(arr[i]);
-		arr[i] = NULL;
-		i++;
+		perror("prepare_command():ft_split()");
+		exit(EXIT_FAILURE);
 	}
-	free(arr);
+	exec_prog(argv, data->envp);
+	my_free_all(argv);
 }

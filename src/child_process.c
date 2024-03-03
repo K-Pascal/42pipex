@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 18:39:50 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 19:00:52 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 #include "gnl/get_next_line.h"
 #include "libft/libft.h"
 
-#include "commands.h"
 #include "utils.h"
 
 static void	choose_input(t_data *data, int pipefd[2]);
@@ -29,21 +28,12 @@ static char	*ask_input(void);
 
 void	child_process(t_data *data, int pipefd[2])
 {
-	char	**argv;
-
 	if (close(pipefd[0]) == -1)
 		perror("child_process():close(pipefd[0])");
 	redirect_pipefd(pipefd[1], STDOUT_FILENO);
 	choose_input(data, pipefd);
 	redirect_pipefd(pipefd[0], STDIN_FILENO);
-	argv = ft_split(data->cmds[0], ' ');
-	if (!argv)
-	{
-		perror("child_process():ft_split()");
-		exit(EXIT_FAILURE);
-	}
-	exec_prog(argv, data->envp);
-	my_free_all(argv);
+	prepare_command(data, 0);
 }
 
 static void	choose_input(t_data *data, int pipefd[2])

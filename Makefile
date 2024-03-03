@@ -38,7 +38,7 @@ OBJ_B	:=	$(OBJ) $(BONUS_OBJ)
 
 CC		:=	cc
 CFLAGS	:=	-Wall -Wextra -Werror
-GDB		:=	-g3
+GDB		:=
 export GDB
 
 LIBFTDIR	:=	libft

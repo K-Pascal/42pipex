@@ -45,10 +45,6 @@ LIBFTDIR	:=	libft
 LIBFT		:=	ft
 LIBFTFILE	:=	lib$(LIBFT).a
 
-GNLDIR	:=	gnl
-GNL		:=	gnl
-GNLFILE	:=	lib$(GNL).a
-
 NAME		:=	pipex
 NAME_BONUS	:=	$(NAME)_bonus
 
@@ -57,24 +53,20 @@ all: $(NAME)
 
 bonus: $(NAME_BONUS)
 
-$(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ_M)
+$(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(OBJ_M)
 	@echo "Creating the executable $(BOLD)$@$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_M) -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)\
+	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_M) -L$(LIBFTDIR) -l$(LIBFT) \
 		&& (echo "$(GOTO_B)$(GREEN)Sucessfully linked into $(BOLD)$@$(DEFAULT)")
 
 
 $(NAME_BONUS): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ_B)
 	@echo "Creating the executable $(BOLD)$@$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_B) -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)\
+	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_B) -L$(LIBFTDIR) -l$(LIBFT) \
 		&& (echo "$(GOTO_B)$(GREEN)Sucessfully linked into $(BOLD)$@$(DEFAULT)")
 
 $(LIBFTDIR)/$(LIBFTFILE):
 	@echo "Creating the library $(ITALIC)$(LIBFTFILE)$(DEFAULT)"
 	@make --silent -C $(LIBFTDIR) && echo "$(GOTO_B)$(GREEN)Sucessfully created $(ITALIC)$(LIBFTFILE)$(DEFAULT)"
-
-$(GNLDIR)/$(GNLFILE):
-	@echo "Creating the library $(ITALIC)$(GNLFILE)$(DEFAULT)"
-	@make --silent -C $(GNLDIR) && echo "$(GOTO_B)$(GREEN)Sucessfully created $(ITALIC)$(GNLFILE)$(DEFAULT)"
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
 	@echo "$(ORANGE)Compiling $(BOLD)$<$(DEFAULT)"
@@ -87,27 +79,16 @@ $(BUILDDIR)/%.o: %.c | $(BUILDDIR)
 $(BUILDDIR):
 	@mkdir -p $@ && echo "$(DIM)Directory $(ITALIC)$@/$(NOITA) created$(DEFAULT)"
 
-.PHONY: clean fclean re norm
+.PHONY: clean fclean re
 clean:
-	@make --silent -C $(GNLDIR) clean
 	@make --silent -C $(LIBFTDIR) clean
 	@rm -f $(OBJ) $(MANDATORY_OBJ) $(BONUS_OBJ) && rm -rf $(BUILDDIR)\
 		&& echo "Removed $(NAME)/$(NAME_BONUS)'s object files and their directory"
 
 
 fclean: clean
-	@make --silent -C $(GNLDIR) fclean
 	@make --silent -C $(LIBFTDIR) fclean
 	@rm -f $(NAME) $(NAME_BONUS) && echo "Removed $(BOLD)$(NAME)$(BOM) and $(BOLD)$(NAME_BONUS)"
 
 
 re: fclean all
-
-norm:
-	@echo "$(CYAN)libft :$(DEFAULT)"
-	@make --silent -C $(LIBFTDIR) norm
-	@echo "$(CYAN)gnl :$(DEFAULT)"
-	@make --silent -C $(GNLDIR) norm
-	@echo "$(CYAN)pipex :$(DEFAULT)"
-	@norminette -R CheckForbiddenSourceHeader $(SRC) $(MANDATORY) $(BONUS)
-	@norminette -R CheckDefine inc/

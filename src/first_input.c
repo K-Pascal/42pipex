@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 17:24:50 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/03 17:17:28 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-#include "gnl/get_next_line.h"
 #include "libft/libft.h"
 
 #include "utils.h"

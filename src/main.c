@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 18:19:35 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/11 18:38:29 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	main(int argc, char **argv, char **envp)
 		return (EXIT_FAILURE);
 	}
 	split_process(&data, pipefd);
-	return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 static int	init_data(t_data *data, int argc, char **argv, char **envp)
@@ -92,7 +92,7 @@ static void	split_process(t_data *data, int pipefd[2])
 		child_process(data, pipefd);
 	else
 	{
+		waitpid(0, NULL, WNOHANG);
 		parent_process(data, pipefd);
-		wait(NULL);
 	}
 }

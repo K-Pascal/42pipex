@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 19:00:52 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/11 16:22:24 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ static void	do_heredoc(t_data *data, int pipefd[2])
 		read_input(data, pipefd);
 		exit(EXIT_SUCCESS);
 	}
-	wait(NULL);
+	waitpid(0, NULL, WUNTRACED);
 	if (close(pipefd[1]) == -1)
 		perror("do_heredoc():close()");
 }

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 19:46:29 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/11 18:38:06 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 static void	exec_inter_cmds(t_data *data, int pipefd[2]);
 static void	create_other_process(t_data *data, int i, int pipefd[2], int fd_in);
+static void	exec_final_cmd(t_data *data, int fd);
 
 void	parent_process(t_data *data, int pipefd[2])
 {
@@ -31,24 +32,19 @@ void	parent_process(t_data *data, int pipefd[2])
 		perror("parent_process():close()");
 	exec_inter_cmds(data, pipefd);
 	redirect_pipefd(pipefd[0], STDIN_FILENO);
-	flags = O_CREAT | O_WRONLY;
-	if (data->limiter != NULL)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
 	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
 	{
 		perror(data->f_out);
 		exit(EXIT_FAILURE);
 	}
-	pipefd[1] = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-	if (pipefd[1] == -1)
-	{
-		perror("parent_process():open()");
-		exit(EXIT_FAILURE);
-	}
-	redirect_pipefd(pipefd[1], STDOUT_FILENO);
-	prepare_command(data, data->nbr_cmds - 1);
+	flags = O_CREAT | O_WRONLY;
+	if (data->limiter != NULL)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+	exec_final_cmd(data, flags);
+	while (waitpid(-1, NULL, WUNTRACED) > 0)
+		;
 }
 
 static void	exec_inter_cmds(t_data *data, int pipefd[2])
@@ -72,8 +68,7 @@ static void	exec_inter_cmds(t_data *data, int pipefd[2])
 			perror("close()");
 		pipefd[0] = fds[0];
 		i++;
-		if (i == data->nbr_cmds)
-			wait(NULL);
+//		waitpid(0, NULL, WNOHANG);
 	}
 }
 
@@ -97,4 +92,29 @@ static void	create_other_process(t_data *data, int i, int pipefd[2], int fd_in)
 	redirect_pipefd(pipefd[1], STDOUT_FILENO);
 	prepare_command(data, i);
 	exit(EXIT_FAILURE);
+}
+
+static void	exec_final_cmd(t_data *data, int flags)
+{
+	pid_t	fpid;
+	int		fd;
+
+	fpid = fork();
+	if (fpid == -1)
+	{
+		perror("exec_final_cmd():fork()");
+		exit(EXIT_FAILURE);
+	}
+	if (fpid == 0)
+	{
+		fd = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		if (fd == -1)
+		{
+			perror("exec_final_cmd():open()");
+			exit(EXIT_FAILURE);
+		}
+		redirect_pipefd(fd, STDOUT_FILENO);
+		prepare_command(data, data->nbr_cmds - 1);
+		exit(EXIT_FAILURE);
+	}
 }

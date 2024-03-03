@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:54:58 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 15:02:26 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/15 21:16:07 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "utils.h"
 
-void	parent_process(t_data *data, int pipefd[2]);
-void	child_process(t_data *data, int pipefd[2]);
+void	pipex(t_data *data, int *status);
+int		choose_input(t_data *data);
+
 #endif

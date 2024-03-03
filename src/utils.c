@@ -6,10 +6,11 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/10 19:00:37 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/12 17:40:16 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,8 +34,11 @@ void	redirect_pipefd(int fd, int newfd)
 
 void	close_pipe(int fds[2])
 {
-	close(fds[0]);
-	close(fds[1]);
+	if (fds != NULL)
+	{
+		close(fds[0]);
+		close(fds[1]);
+	}
 }
 
 void	my_free_all(char **arr)
@@ -56,6 +60,7 @@ void	my_free_all(char **arr)
 void	prepare_command(t_data *data, int i)
 {
 	char	**argv;
+	int		status;
 
 	argv = ft_split(data->cmds[i], ' ');
 	if (!argv)
@@ -63,6 +68,9 @@ void	prepare_command(t_data *data, int i)
 		perror("prepare_command():ft_split()");
 		exit(EXIT_FAILURE);
 	}
-	exec_prog(argv, data->envp);
+	status = exec_prog(argv, data->envp);
 	my_free_all(argv);
+	if (errno == EACCES)
+		status = 126;
+	exit(status);
 }

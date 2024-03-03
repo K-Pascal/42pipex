@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 16:29:54 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 17:23:25 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ int	exec_prog(char **argv, char **envp)
 
 	paths = get_path(envp);
 	pathname = check_command(argv[0], paths, F_OK | X_OK);
-	if (!pathname)
+	if (pathname == NULL)
 		pathname = check_command(argv[0], paths, F_OK);
 	my_free_all(paths);
-	if (!pathname)
+	if (pathname == NULL)
 	{
 		if (!!ft_strncmp(argv[0], "./", 2))
 		{
@@ -73,7 +73,7 @@ static char	**get_path(char **envp)
 	if (path_env == NULL)
 		return (NULL);
 	paths = ft_split(path_env, ':');
-	if (!paths)
+	if (paths == NULL)
 		perror("getpath():ft_split()");
 	return (paths);
 }
@@ -89,7 +89,7 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	if (paths == NULL || !ft_strncmp(cmd_name, "./", 2))
 		return (NULL);
 	i = 0;
-	while (paths[i])
+	while (paths[i] != NULL)
 	{
 		cmd = joinpath(paths[i], cmd_name);
 		if (access(cmd, mode) != -1)

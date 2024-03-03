@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 15:30:49 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 17:24:50 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ static void	read_input(t_data *data, int pipefd[2])
 		perror("read_input():close(pipefd[0])");
 	len_limiter = ft_strlen(data->limiter);
 	input = ask_input();
-	while (input)
+	while (input != NULL)
 	{
 		if (!ft_strncmp(input, data->limiter, len_limiter)
 			&& input[len_limiter] == '\n')

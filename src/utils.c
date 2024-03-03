@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 14:43:51 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 17:28:41 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	my_free_all(char **arr)
 	if (arr == NULL)
 		return ;
 	i = 0;
-	while (arr[i])
+	while (arr[i] != NULL)
 	{
 		free(arr[i]);
 		arr[i] = NULL;
@@ -65,7 +65,7 @@ void	prepare_command(t_data *data, int i)
 	int		status;
 
 	argv = ft_split(data->cmds[i], ' ');
-	if (!argv)
+	if (argv == NULL)
 	{
 		perror("prepare_command():ft_split()");
 		exit(EXIT_FAILURE);

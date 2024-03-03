@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 12:36:30 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 14:43:51 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,8 @@ void	prepare_command(t_data *data, int i)
 	}
 	if (argv[0] == NULL)
 	{
-		ft_putendl_fd("prepare_command():argv: first element is NULL", 2);
 		my_free_all(argv);
-		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
 	}
 	status = exec_prog(argv, data->envp);
 	my_free_all(argv);

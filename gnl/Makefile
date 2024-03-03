@@ -3,7 +3,7 @@ SRC := get_next_line.c \
 OBJ := $(SRC:.c=.o)
 
 CC := cc
-CFLAGS := -Wall -Wextra -Werror
+CFLAGS := -Wall -Wextra -Werror -D BUFFER_SIZE=1
 NAME := libgnl.a
 
 GDB ?= 

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 16:27:48 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 18:19:35 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 
 #include "libft/libft.h"
 
-#include "parser.h"
 #include "process.h"
 #include "utils.h"
 
@@ -40,14 +39,13 @@ int	main(int argc, char **argv, char **envp)
 		return (EXIT_FAILURE);
 	}
 	start = init_data(&data, argc, argv, envp);
-	check_args(&data, &(argv[start]));
+	data.cmds = &argv[start];
 	if (pipe(pipefd) == -1)
 	{
 		perror("pipe()");
 		return (EXIT_FAILURE);
 	}
 	split_process(&data, pipefd);
-	my_n_free_all(data.cmds, data.nbr_cmds);
 	return (EXIT_FAILURE);
 }
 
@@ -87,14 +85,14 @@ static void	split_process(t_data *data, int pipefd[2])
 	fpid = fork();
 	if (fpid == -1)
 	{
-		free_pipex(data, NULL, pipefd, "split_process():fork()");
+		close_pipe(pipefd);
 		exit(EXIT_FAILURE);
 	}
 	if (fpid == 0)
 		child_process(data, pipefd);
 	else
 	{
-		wait(NULL);
 		parent_process(data, pipefd);
+		wait(NULL);
 	}
 }

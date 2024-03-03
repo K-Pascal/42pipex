@@ -1,5 +1,5 @@
 FILES := main.c \
-		 parser.c \
+		 commands.c \
 		 utils.c \
 		 child_process.c \
 		 parent_process.c

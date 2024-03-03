@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 16:26:47 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 18:39:50 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@
 #include "gnl/get_next_line.h"
 #include "libft/libft.h"
 
+#include "commands.h"
 #include "utils.h"
 
+static void	choose_input(t_data *data, int pipefd[2]);
 static void	do_heredoc(t_data *data, int pipefd[2]);
 static void	read_input(t_data *data, int pipefd[2]);
 static char	*ask_input(void);
@@ -30,23 +32,38 @@ void	child_process(t_data *data, int pipefd[2])
 	char	**argv;
 
 	if (close(pipefd[0]) == -1)
-		perror("parent_process():close(pipefd[0])");
-	redirect_pipefd(data, pipefd[1], STDOUT_FILENO);
+		perror("child_process():close(pipefd[0])");
+	redirect_pipefd(pipefd[1], STDOUT_FILENO);
+	choose_input(data, pipefd);
+	redirect_pipefd(pipefd[0], STDIN_FILENO);
+	argv = ft_split(data->cmds[0], ' ');
+	if (!argv)
+	{
+		perror("child_process():ft_split()");
+		exit(EXIT_FAILURE);
+	}
+	exec_prog(argv, data->envp);
+	my_free_all(argv);
+}
+
+static void	choose_input(t_data *data, int pipefd[2])
+{
 	if (data->limiter != NULL)
 		do_heredoc(data, pipefd);
 	else
 	{
+		if (access(data->f_in, F_OK | R_OK) == -1)
+		{
+			perror(data->f_in);
+			exit(EXIT_FAILURE);
+		}
 		pipefd[0] = open(data->f_in, O_RDONLY);
 		if (pipefd[0] == -1)
 		{
-			free_pipex(data, NULL, NULL, "parent_process():open()");
+			perror("child_process():open()");
 			exit(EXIT_FAILURE);
 		}
 	}
-	redirect_pipefd(data, pipefd[0], STDIN_FILENO);
-	argv = ft_split(data->cmds[0], ' ');
-	exec_prog(argv[0], argv, data->envp);
-	my_free_all(argv);
 }
 
 static void	do_heredoc(t_data *data, int pipefd[2])
@@ -55,19 +72,19 @@ static void	do_heredoc(t_data *data, int pipefd[2])
 
 	if (pipe(pipefd) == -1)
 	{
-		free_pipex(data, NULL, NULL, "do_heredoc():pipe()");
+		perror("do_heredoc():pipe()");
 		exit(EXIT_FAILURE);
 	}
 	fpid = fork();
 	if (fpid == -1)
 	{
-		free_pipex(data, NULL, pipefd, "do_heredoc():fork()");
+		perror("do_heredoc():fork()");
+		close_pipe(pipefd);
 		exit(EXIT_FAILURE);
 	}
 	if (fpid == 0)
 	{
 		read_input(data, pipefd);
-		free_pipex(data, NULL, NULL, NULL);
 		exit(EXIT_SUCCESS);
 	}
 	wait(NULL);
@@ -86,7 +103,7 @@ static void	read_input(t_data *data, int pipefd[2])
 	limiter = ft_strjoin(data->limiter, "\n");
 	if (!limiter)
 	{
-		free_pipex(data, NULL, NULL, "read_input():ft_strjoin()");
+		perror("read_input():ft_strjoin()");
 		close(pipefd[1]);
 		exit(EXIT_FAILURE);
 	}

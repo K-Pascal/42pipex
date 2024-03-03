@@ -1,20 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.h                                           :+:      :+:    :+:   */
+/*   commands.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:16:05 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 15:03:51 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/10 18:07:59 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSER_H
-# define PARSER_H
+#ifndef COMMANDS_H
+# define COMMANDS_H
 
-# include "utils.h"
-
-void	check_args(t_data *data, char **argv);
+void	exec_prog(char **argv, char **envp);
 
 #endif

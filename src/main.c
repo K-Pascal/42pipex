@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 11:50:43 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 18:41:30 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 #include "process.h"
 #include "utils.h"
 
-#define MSG1 "Usage : ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
-#define MSG2 "Usage : ./pipex here_doc [LIMITER] [cmd 1] [cmd 2] [output file]\n"
+#define MSG1 "Usage: ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
+#define MSG2 "Usage: ./pipex here_doc [LIMITER] [cmd 1] [cmd 2] [output file]\n"
 #define SIG_RETURN 128
 
 static int	init_data(t_data *data, int argc, char **argv, char **envp);

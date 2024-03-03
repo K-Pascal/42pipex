@@ -90,9 +90,7 @@ static char	*check_command(char cmd[], char **paths, int mode)
 
 	if (is_valid_command(cmd, mode))
 		return (ft_strdup(cmd));
-	if (paths == NULL)
-		return (NULL);
-	if (!ft_strncmp(cmd, "./", 2))
+	if (paths == NULL || !ft_strncmp(cmd, "./", 2))
 		return (NULL);
 	cmd_name = ft_strjoin("/", cmd);
 	i = 0;
@@ -111,21 +109,18 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	return (NULL);
 }
 
-static int	is_valid_command(char arg[])
+static int	is_valid_command(char arg[], int mode)
 {
-	int	i;
-	int	len;
-	int	status;
+	int		i;
+	char	temp;
+	int		status;
 
 	i = 0;
 	while (arg[i] && arg[i] != ' ')
 		i++;
-	len = i;
-	while (arg[len])
-		len++;
+	temp = arg[i];
 	arg[i] = '\0';
-	status = access(arg, F_OK | X_OK) != -1;
-	if (i != len)
-		arg[i] = ' ';
+	status = access(arg, mode) != -1;
+	arg[i] = temp;
 	return (status);
 }

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 17:28:41 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/03 18:28:16 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	redirect_pipefd(int fd, int newfd)
 		close(fd);
 		exit(EXIT_FAILURE);
 	}
+
 	if (close(fd) == -1)
 		perror("redirect_pipefd():close()");
 }
@@ -45,11 +46,10 @@ void	close_pipe(int fds[2])
 
 void	my_free_all(char **arr)
 {
-	int	i;
-
 	if (arr == NULL)
 		return ;
-	i = 0;
+
+	int i = 0;
 	while (arr[i] != NULL)
 	{
 		free(arr[i]);
@@ -61,23 +61,22 @@ void	my_free_all(char **arr)
 
 void	prepare_command(t_data *data, int i)
 {
-	char	**argv;
-	int		status;
-
-	argv = ft_split(data->cmds[i], ' ');
+	char **argv = ft_split(data->cmds[i], ' ');
 	if (argv == NULL)
 	{
 		perror("prepare_command():ft_split()");
 		exit(EXIT_FAILURE);
 	}
+
 	if (argv[0] == NULL)
 	{
 		my_free_all(argv);
 		exit(EXIT_SUCCESS);
 	}
-	status = exec_prog(argv, data->envp);
-	my_free_all(argv);
+
+	int status = exec_prog(argv, data->envp);
 	if (errno == EACCES)
 		status = ERR_ACCESS;
+	my_free_all(argv);
 	exit(status);
 }

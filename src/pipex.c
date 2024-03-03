@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 15:33:56 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/03 18:26:16 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,35 +28,34 @@ static void		wait_all(pid_t last_process_id, int *status);
 
 void	pipex(t_data *data, int *status)
 {
-	int		i;
-	int		pipefd[2];
-	int		fd_in;
 	pid_t	fpid;
-
-	fd_in = -1;
-	i = 0;
+	int		fd_in = -1;
+	int		i = 0;
 	while (i < data->nbr_cmds)
 	{
+		int pipefd[2];
 		if (pipe(pipefd) == -1)
 		{
 			perror("pipex():pipe()");
 			close(fd_in);
 			exit(EXIT_FAILURE);
 		}
+
 		fpid = create_process(data, i, pipefd, fd_in);
+
 		fd_in = pipefd[0];
 		i++;
 	}
+
 	if (close(fd_in) == -1)
 		perror("pipex():close(fd_in)");
+
 	wait_all(fpid, status);
 }
 
 static pid_t	create_process(t_data *data, int index, int fds[2], int fd_in)
 {
-	pid_t	fpid;
-
-	fpid = fork();
+	pid_t fpid = fork();
 	if (fpid == -1)
 	{
 		perror("create_process():fork()");
@@ -66,10 +65,12 @@ static pid_t	create_process(t_data *data, int index, int fds[2], int fd_in)
 	}
 	if (fpid == 0)
 		pipe_exec(data, index, fds, fd_in);
+
 	if (close(fds[1]) == -1)
 		perror("create_process():close(fds[1])");
 	if (fd_in != -1 && close(fd_in) == -1)
 		perror("create_process():close(fd_in)");
+
 	return (fpid);
 }
 
@@ -77,6 +78,7 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 {
 	if (close(fds[0]) == -1)
 		perror("pipex_exec():close(fds[0])");
+
 	if (index + 1 == data->nbr_cmds)
 	{
 		if (close(fds[1]) == -1)
@@ -84,43 +86,42 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 		fds[1] = final_cmd(data, fd_in);
 	}
 	redirect_pipefd(fds[1], STDOUT_FILENO);
+
 	if (index == 0)
 		fd_in = choose_input(data);
 	redirect_pipefd(fd_in, STDIN_FILENO);
+
 	prepare_command(data, index);
 }
 
 static int	final_cmd(t_data *data, int fd_in)
 {
-	int	flags;
-	int	fd_out;
-
 	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
 	{
 		perror(data->f_out);
 		close(fd_in);
 		exit(EXIT_FAILURE);
 	}
-	flags = O_CREAT | O_WRONLY;
+
+	int flags = O_CREAT | O_WRONLY;
 	if (data->limiter != NULL)
 		flags |= O_APPEND;
 	else
 		flags |= O_TRUNC;
-	fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd_out == -1)
 	{
 		perror(data->f_out);
 		close(fd_in);
 		exit(EXIT_FAILURE);
 	}
+
 	return (fd_out);
 }
 
 static void	wait_all(pid_t last_process_id, int *status)
 {
-	pid_t	fpid;
-
-	fpid = waitpid(0, status, WNOHANG | WUNTRACED);
+	pid_t fpid = waitpid(0, status, WNOHANG | WUNTRACED);
 	while (fpid != last_process_id && fpid != -1)
 		fpid = waitpid(0, status, WNOHANG | WUNTRACED);
 	while (waitpid(0, NULL, WNOHANG) >= 0)

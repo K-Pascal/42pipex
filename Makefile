@@ -13,6 +13,11 @@ export GDB
 LIBFTDIR := libft
 LIBFTFILE := libft.a
 LIBFT := ft
+
+GNLDIR := gnl
+GNLFILE := libgnl.a
+GNL := gnl
+
 NAME := pipex
 
 .PHONY: all
@@ -24,6 +29,9 @@ $(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(OBJ)
 $(LIBFTDIR)/$(LIBFTFILE):
 	make -C $(LIBFTDIR)
 
+$(GNLDIR)/$(GNLFILE):
+	make -C $(GNLDIR)
+
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p build/
 	$(CC) $(CFLAGS) $(GDB) -c $< -o $@
@@ -31,13 +39,18 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 .PHONY: clean fclean re norm
 clean:
 	rm -f $(OBJ)
+	make -C $(GNLDIR) clean
+	make -C $(LIBFTDIR) clean
 
 fclean: clean
 	rm -f $(NAME)
+	make -C $(GNLDIR) fclean
+	make -C $(LIBFTDIR) fclean
 
 re: fclean all
 
 norm:
 	make -C $(LIBFTDIR) norm
+	make -C $(GNLDIR) norm
 	norminette -R CheckForbiddenSourceHeader $(SRC)
 	norminette -R CheckDefine inc/

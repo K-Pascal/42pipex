@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/03 19:22:20 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/05 15:54:48 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,23 @@
 #include <sys/wait.h>
 
 #include "libft/libft.h"
+#include "gnl/get_next_line.h"
 
-typedef struct s_args
+#undef BUFFER_SIZE
+#define BUFFER_SIZE 1
+
+#define MSG1 "Usage : ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
+#define MSG2 "Usage : ./pipex here_doc [LIMITER] [cmd 1] [cmd 2] [output file]\n"
+
+typedef struct s_data
 {
-	int		argc;
-	char	*delimiter;
+	char	*limiter;
 	char	*file_input;
 	char	*file_output;
 	int		nbr_cmds;
 	char	**cmds;
 	char	**envp;
-}	t_args;
+}	t_data;
 
 void	exec_prog(char const *pathname, char *const argv[], char *const envp[])
 {
@@ -39,10 +45,13 @@ void	my_free_all(char **arr)
 {
 	int	i;
 
+	if (arr == NULL)
+		return ;
 	i = 0;
 	while (arr[i])
 	{
 		free(arr[i]);
+		arr[i] = NULL;
 		i++;
 	}
 	free(arr);
@@ -52,19 +61,34 @@ void	my_n_free_all(char **arr, int len)
 {
 	int	i;
 
+	if (arr == NULL)
+		return ;
 	i = 0;
 	while (i < len)
 	{
 		free(arr[i]);
+		arr[i] = NULL;
 		i++;
 	}
 	free(arr);
+}
+
+void	quit_prog(t_data *data, char **path, char msg[], int status)
+{
+	if (msg != NULL)
+		perror(msg);
+	if (data != NULL)
+		my_n_free_all(data->cmds, data->nbr_cmds);
+	my_free_all(path);
+	exit(status);
 }
 
 char	*findpath(char **envp)
 {
 	int	i;
 
+	if (envp == NULL)
+		return (NULL);
 	i = 0;
 	while (envp[i])
 	{
@@ -101,6 +125,8 @@ char	*check_command(char cmd[], char **paths)
 
 	if (is_valid_command(cmd))
 		return (ft_strdup(cmd));
+	if (paths == NULL)
+		return (NULL);
 	cmd_name = ft_strjoin("/", cmd);
 	i = 0;
 	while (paths[i])
@@ -114,145 +140,190 @@ char	*check_command(char cmd[], char **paths)
 		free(cmd);
 		i++;
 	}
-	perror(cmd_name + 1);
+	perror(&(cmd_name[1]));
 	free(cmd_name);
 	return (NULL);
 }
 
-void	check_args(t_args *args, char **argv)
+void	check_args(t_data *data, char **argv)
 {
 	int		i;
 	char	*path_env;
 	char	**paths;
 
-	if (args->file_input && access(args->file_input, F_OK | R_OK) == -1)
+	paths = NULL;
+	if (data->file_input && access(data->file_input, F_OK | R_OK) == -1)
+		quit_prog(data, NULL, data->file_input, EXIT_FAILURE);
+	if (access(data->file_output, F_OK) != -1
+		&& access(data->file_output, W_OK) == -1)
+		quit_prog(data, NULL, data->file_output, EXIT_FAILURE);
+	path_env = findpath(data->envp);
+	if (path_env)
 	{
-		perror(args->file_input);
-		exit(EXIT_FAILURE);
+		paths = ft_split(path_env, ':');
+		if (!paths)
+			quit_prog(data, NULL, "check_args():ft_split()", EXIT_FAILURE);
 	}
-	if (access(args->file_output, F_OK) != -1
-		&& access(args->file_output, W_OK) == -1)
-	{
-		perror(args->file_output);
-		exit(EXIT_FAILURE);
-	}
-	path_env = findpath(args->envp);
-	if (!path_env)
-	{
-		ft_putendl_fd("environment variable PATH not found", 2);
-		exit(EXIT_FAILURE);
-	}
-	paths = ft_split(path_env, ':');
-	if (!paths)
-	{
-		perror("ft_split()");
-		exit(EXIT_FAILURE);
-	}
-	args->cmds = malloc(args->nbr_cmds * sizeof(char *));
-	if (!args->cmds)
-	{
-		perror("check_args()");
-		exit(EXIT_FAILURE);
-	}
+	data->cmds = malloc(data->nbr_cmds * sizeof(char *));
+	if (!data->cmds)
+		quit_prog(data, paths, "check_args():malloc()", EXIT_FAILURE);
 	i = 0;
-	while (i < args->nbr_cmds)
+	while (i < data->nbr_cmds)
 	{
-		args->cmds[i] = check_command(argv[i], paths);
-		if (!args->cmds[i])
+		data->cmds[i] = check_command(argv[i], paths);
+		if (!data->cmds[i])
 		{
-			my_n_free_all(args->cmds, i);
-			my_free_all(paths);
-			exit(EXIT_FAILURE);
+			my_n_free_all(data->cmds, i);
+			quit_prog(NULL, paths, NULL, EXIT_FAILURE);
 		}
 		i++;
 	}
 	my_free_all(paths);
 }
 
-void	parent(int pipefd[2], char file[], char command[], char **envp)
+void	read_input(int pipefd[2], t_data *data)
+{
+	size_t	len_limiter;
+	char	*input;
+	char	*limiter;
+
+	if (close(pipefd[0]) == -1)
+		perror("read_input():close()");
+	limiter = ft_strjoin(data->limiter, "\n");
+	if (!limiter)
+		quit_prog(data, NULL, "read_input():ft_strjoin()", EXIT_FAILURE);
+	len_limiter = ft_strlen(limiter);
+	ft_putstr_fd("> ", STDIN_FILENO);
+	input = get_next_line(STDIN_FILENO);
+	while (input && ft_strncmp(input, limiter, len_limiter))
+	{
+		ft_putstr_fd(input, pipefd[1]);
+		ft_putstr_fd("> ", STDIN_FILENO);
+		free(input);
+		input = get_next_line(STDIN_FILENO);
+	}
+	if (close(pipefd[1]) == -1)
+		perror("read_input():close()");
+	free(input);
+	free(limiter);
+}
+
+void	parent_process(int pipefd[2], t_data *data)
 {
 	char	**argv;
+	pid_t	fpid;
 
-	dup2(pipefd[1], 1);
-	if (close(pipefd[0]) == -1|| close(pipefd[1]) == -1)
+	if (close(pipefd[0]) == -1)
+		perror("parent_process():close()");
+	if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+		quit_prog(data, NULL, "parent_process():dup2()", EXIT_FAILURE);
+	if (close(pipefd[1]) == -1)
+		perror("parent_process():close()");
+	if (data->limiter != NULL)
 	{
-		perror("close");
-		return ;
+		if (pipe(pipefd) == -1)
+			quit_prog(data, NULL, "parent_process():pipe()", EXIT_FAILURE);
+		fpid = fork();
+		if (fpid == -1)
+			quit_prog(data, NULL, "parent_process():fork()", EXIT_FAILURE);
+		else if (!fpid)
+		{
+			read_input(pipefd, data);
+			return ;
+		}
+		if (close(pipefd[1]) == -1)
+			perror("parent_process():close()");
+		waitpid(0, NULL, WCONTINUED);
 	}
-	pipefd[0] = open(file, O_RDONLY);
-	dup2(pipefd[0], 0);
-	close(pipefd[0]);
-	argv = ft_split(command, ' ');
-	exec_prog(argv[0], argv, envp);
+	else
+	{
+		pipefd[0] = open(data->file_input, O_RDONLY);
+		if (pipefd[0] == -1)
+			quit_prog(data, NULL, "parent_process():open()", EXIT_FAILURE);
+	}
+	if (dup2(pipefd[0], STDIN_FILENO) == -1)
+		quit_prog(data, NULL, "parent_process():dup2()", EXIT_FAILURE);
+	if (close(pipefd[0]) == -1)
+		perror("parent_process():close()");
+	argv = ft_split(data->cmds[0], ' ');
+	exec_prog(argv[0], argv, data->envp);
 	my_free_all(argv);
-	wait(NULL);
+}
+
+int	init_data(t_data *data, int argc, char **argv, char **envp)
+{
+	int	start;
+
+	if (!ft_strncmp(argv[1], "here_doc", 8))
+	{
+		if (argc != 6)
+		{
+			ft_putendl_fd(MSG2, 2);
+			exit(EXIT_FAILURE);
+		}
+		data->limiter = argv[2];
+		data->file_input = NULL;
+		data->nbr_cmds = argc - 4;
+		start = 3;
+	}
+	else
+	{
+		data->file_input = argv[1];
+		data->limiter = NULL;
+		data->nbr_cmds = argc - 3;
+		start = 2;
+	}
+	data->file_output = argv[argc - 1];
+	data->cmds = NULL;
+	data->envp = envp;
+	return (start);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	pid_t	fpid;
 	int		pipefd[2];
-	t_args	args;
+	t_data	data;
 	int		start;
 
 	if (argc < 5)
+	{
+		ft_putstr_fd(MSG1 MSG2, 2);
 		return (EXIT_FAILURE);
-	if (!ft_strncmp(argv[1], "here_doc", 8))
-	{
-		if (argc != 6)
-		{
-			ft_putendl_fd("Usage : ./pipex here_doc [LIMITER] [cmd1] [cmd2] [output file]", 2);
-			return (EXIT_FAILURE);
-		}
-		args.delimiter = argv[2];
-		args.file_input = NULL;
-		args.nbr_cmds = argc - 4;
-		start = 3;
 	}
-	else
-	{
-		args.file_input = argv[1];
-		args.delimiter = NULL;
-		args.nbr_cmds = argc - 3;
-		start = 2;
-	}
-	args.argc = argc;
-	args.file_output = argv[argc - 1];
-	args.envp = envp;
-	check_args(&args, &(argv[start]));
+	start = init_data(&data, argc, argv, envp);
+	check_args(&data, &(argv[start]));
 	if (pipe(pipefd) == -1)
 	{
-		perror("pipe");
+		perror("main():pipe()");
 		return (EXIT_FAILURE);
 	}
 	fpid = fork();
 	if (fpid == -1)
 	{
-		if (close(pipefd[0]) == -1)
-			perror("close");
-		if (close(pipefd[1]) == -1)
-			perror("close");
-		perror("fork");
-		return (EXIT_FAILURE);
+		perror("main():fork()");
+		exit(EXIT_FAILURE);
 	}
 	if (fpid == 0)
 	{
 		close(pipefd[1]);
-
-		dup2(pipefd[0], 0);
+		dup2(pipefd[0], STDIN_FILENO);
 		close(pipefd[0]);
-		pipefd[1] = open(args.file_output, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		dup2(pipefd[1], 1);
+		if (data.limiter != NULL)
+			pipefd[1] = open(data.file_output, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		else
+			pipefd[1] = open(data.file_output, O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		dup2(pipefd[1], STDOUT_FILENO);
 		close(pipefd[1]);
-		// read
-		argv = ft_split(args.cmds[1], ' ');
+		argv = ft_split(data.cmds[1], ' ');
 		exec_prog(argv[0], argv, envp);
 		my_free_all(argv);
 	}
 	else
 	{
-		parent(pipefd, args.file_input, args.cmds[0], args.envp);
+		parent_process(pipefd, &data);
+		wait(NULL);
 	}
-	my_n_free_all(args.cmds, args.nbr_cmds);
+	my_n_free_all(data.cmds, data.nbr_cmds);
 	return (EXIT_SUCCESS);
 }

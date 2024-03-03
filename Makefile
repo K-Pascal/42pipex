@@ -2,7 +2,7 @@ FILES := main.c \
 		 commands.c \
 		 utils.c \
 		 child_process.c \
-		 parent_process.c
+		 pipex.c
 
 SRCDIR := src
 BUILDDIR := build
@@ -27,7 +27,7 @@ NAME := pipex
 .PHONY: all bonus
 all: $(NAME)
 
-bonus : all
+bonus: all
 
 $(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ)
 	$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ) -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)

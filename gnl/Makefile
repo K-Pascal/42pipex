@@ -3,7 +3,7 @@ SRC := get_next_line.c \
 OBJ := $(SRC:.c=.o)
 
 CC := cc
-CFLAGS := -Wall -Wextra -Werror -D BUFFER_SIZE=1
+CFLAGS := -Wall -Wextra -Werror -D BUFFER_SIZE=42
 NAME := libgnl.a
 
 GDB ?= 
@@ -14,7 +14,7 @@ all : $(NAME)
 $(NAME): $(OBJ)
 	ar rcs $@ $^
 
-%.o: %.c
+%.o: %.c Makefile
 	$(CC) $(CFLAGS) $(GDB) -I. -c $< -o $@
 
 .PHONY: clean fclean re norm

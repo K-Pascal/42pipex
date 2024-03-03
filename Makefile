@@ -1,7 +1,7 @@
 FILES := main.c \
 		 commands.c \
 		 utils.c \
-		 child_process.c \
+		 first_input.c \
 		 pipex.c
 
 SRCDIR := src

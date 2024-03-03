@@ -11,7 +11,7 @@ OBJ := $(addprefix $(BUILDDIR)/,$(FILES:.c=.o))
 
 CC := cc
 CFLAGS := -Wall -Wextra -Werror
-GDB := -g3
+GDB :=
 export GDB
 
 LIBFTDIR := libft
@@ -24,8 +24,10 @@ GNL := gnl
 
 NAME := pipex
 
-.PHONY: all
+.PHONY: all bonus
 all: $(NAME)
+
+bonus : all
 
 $(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ)
 	$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ) -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 12:28:25 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/16 14:46:48 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #define ERR_CMD_NOT_FOUND 127
 
 static char	**get_path(char **envp);
-static char	*find_pathenv(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
 static int	is_valid_command(char arg[], int mode);
 
@@ -56,31 +55,27 @@ static char	**get_path(char **envp)
 {
 	char	*path_env;
 	char	**paths;
+	int		i;
 
-	paths = NULL;
-	path_env = find_pathenv(envp);
+	if (envp == NULL)
+		return (NULL);
+	path_env = NULL;
+	i = 0;
+	while (envp[i] != NULL)
+	{
+		if (!ft_strncmp(envp[i], "PATH=", 5))
+		{
+			path_env = envp[i] + 5;
+			break ;
+		}
+		i++;
+	}
 	if (path_env == NULL)
 		return (NULL);
 	paths = ft_split(path_env, ':');
 	if (!paths)
 		perror("getpath():ft_split()");
 	return (paths);
-}
-
-static char	*find_pathenv(char **envp)
-{
-	int	i;
-
-	if (envp == NULL)
-		return (NULL);
-	i = 0;
-	while (envp[i])
-	{
-		if (!ft_strncmp(envp[i], "PATH=", 5))
-			return (envp[i] + 5);
-		i++;
-	}
-	return (NULL);
 }
 
 static char	*check_command(char cmd[], char **paths, int mode)

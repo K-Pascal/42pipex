@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 13:09:22 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 15:21:52 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
+static char	*joinpath(char path[], char cmd[]);
 
 int	exec_prog(char **argv, char **envp)
 {
@@ -82,23 +83,36 @@ static char	*check_command(char cmd[], char **paths, int mode)
 	char	*cmd_name;
 	int		i;
 
-	if (access(cmd, mode) != -1)
-		return (ft_strdup(cmd));
-	if (paths == NULL || !ft_strncmp(cmd, "./", 2))
+	cmd_name = cmd;
+	if (access(cmd_name, mode) != -1)
+		return (ft_strdup(cmd_name));
+	if (paths == NULL || !ft_strncmp(cmd_name, "./", 2))
 		return (NULL);
-	cmd_name = ft_strjoin("/", cmd);
 	i = 0;
 	while (paths[i])
 	{
-		cmd = ft_strjoin(paths[i], cmd_name);
+		cmd = joinpath(paths[i], cmd_name);
 		if (access(cmd, mode) != -1)
-		{
-			free(cmd_name);
 			return (cmd);
-		}
 		free(cmd);
 		i++;
 	}
-	free(cmd_name);
 	return (NULL);
+}
+
+static char	*joinpath(char path[], char cmd[])
+{
+	char	*pathname;
+	size_t	len_path;
+	size_t	len_cmd;
+
+	len_path = ft_strlen(path);
+	len_cmd = ft_strlen(cmd);
+	pathname = malloc((len_path + len_cmd + 2) * sizeof(char));
+	if (pathname == NULL)
+		return (NULL);
+	ft_strlcpy(pathname, path, len_path + 1);
+	pathname[len_path] = '/';
+	ft_strlcpy(pathname + len_path + 1, cmd, len_cmd + 1);
+	return (pathname);
 }

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:11:04 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/08 17:38:05 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/09 14:57:52 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_data
 	char	**envp;
 }	t_data;
 
+void	redirect_pipefd(t_data *data, int fd, int newfd);
 void	exec_prog(char const *pathname, char *const argv[], char *const envp[]);
 void	free_pipex(t_data *data, char **path, int fd[2], char msg[]);
 void	my_free_all(char **arr);

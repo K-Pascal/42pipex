@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/08 17:36:34 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/09 15:08:51 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include "libft/libft.h"
+
 #include "utils.h"
 
 static char	*findpath(char **envp)

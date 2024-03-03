@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.h                                           :+:      :+:    :+:   */
+/*   process.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/05 16:16:05 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/09 15:03:51 by pnguyen-         ###   ########.fr       */
+/*   Created: 2024/01/09 14:54:58 by pnguyen-          #+#    #+#             */
+/*   Updated: 2024/01/09 15:02:26 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSER_H
-# define PARSER_H
+#ifndef PROCESS_H
+# define PROCESS_H
 
 # include "utils.h"
 
-void	check_args(t_data *data, char **argv);
-
+void	parent_process(t_data *data, int pipefd[2]);
+void	child_process(t_data *data, int pipefd[2]);
 #endif

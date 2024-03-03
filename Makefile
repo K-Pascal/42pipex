@@ -1,6 +1,8 @@
 FILES := main.c \
 		 parser.c \
-		 utils.c
+		 utils.c \
+		 child_process.c \
+		 parent_process.c
 
 SRCDIR := src
 BUILDDIR := build

@@ -6,11 +6,10 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/08 17:39:18 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/09 15:04:35 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,6 +20,18 @@ void	exec_prog(char const *pathname, char *const argv[], char *const envp[])
 {
 	execve(pathname, argv, envp);
 	perror(pathname);
+}
+
+void	redirect_pipefd(t_data *data, int fd, int newfd)
+{
+	if (dup2(fd, newfd) == -1)
+	{
+		free_pipex(data, NULL, NULL, "redirect_pipefd():dup2()");
+		close(fd);
+		exit(EXIT_FAILURE);
+	}
+	if (close(fd) == -1)
+		perror("redirect_pipefd():close()");
 }
 
 void	free_pipex(t_data *data, char **path, int fds[2], char msg[])

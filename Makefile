@@ -1,4 +1,6 @@
-FILES := main.c
+FILES := main.c \
+		 parser.c \
+		 utils.c
 
 SRCDIR := src
 BUILDDIR := build
@@ -24,7 +26,7 @@ NAME := pipex
 all: $(NAME)
 
 $(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ)
-	$(CC) $(CFLAGS) $(GDB) -I. -o $@ $^ -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)
+	$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ) -L$(LIBFTDIR) -l$(LIBFT) -L$(GNLDIR) -l$(GNL)
 
 $(LIBFTDIR)/$(LIBFTFILE):
 	make -C $(LIBFTDIR)
@@ -34,7 +36,7 @@ $(GNLDIR)/$(GNLFILE):
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p build/
-	$(CC) $(CFLAGS) $(GDB) -I. -c $< -o $@
+	$(CC) $(CFLAGS) $(GDB) -I. -Iinc -c $< -o $@
 
 .PHONY: clean fclean re norm
 clean:

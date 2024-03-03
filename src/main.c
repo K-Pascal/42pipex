@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/05 15:54:48 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/05 16:17:09 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,168 +18,14 @@
 
 #include "libft/libft.h"
 #include "gnl/get_next_line.h"
+#include "utils.h"
+#include "parser.h"
 
 #undef BUFFER_SIZE
 #define BUFFER_SIZE 1
 
 #define MSG1 "Usage : ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
 #define MSG2 "Usage : ./pipex here_doc [LIMITER] [cmd 1] [cmd 2] [output file]\n"
-
-typedef struct s_data
-{
-	char	*limiter;
-	char	*file_input;
-	char	*file_output;
-	int		nbr_cmds;
-	char	**cmds;
-	char	**envp;
-}	t_data;
-
-void	exec_prog(char const *pathname, char *const argv[], char *const envp[])
-{
-	execve(pathname, argv, envp);
-	perror(pathname);
-}
-
-void	my_free_all(char **arr)
-{
-	int	i;
-
-	if (arr == NULL)
-		return ;
-	i = 0;
-	while (arr[i])
-	{
-		free(arr[i]);
-		arr[i] = NULL;
-		i++;
-	}
-	free(arr);
-}
-
-void	my_n_free_all(char **arr, int len)
-{
-	int	i;
-
-	if (arr == NULL)
-		return ;
-	i = 0;
-	while (i < len)
-	{
-		free(arr[i]);
-		arr[i] = NULL;
-		i++;
-	}
-	free(arr);
-}
-
-void	quit_prog(t_data *data, char **path, char msg[], int status)
-{
-	if (msg != NULL)
-		perror(msg);
-	if (data != NULL)
-		my_n_free_all(data->cmds, data->nbr_cmds);
-	my_free_all(path);
-	exit(status);
-}
-
-char	*findpath(char **envp)
-{
-	int	i;
-
-	if (envp == NULL)
-		return (NULL);
-	i = 0;
-	while (envp[i])
-	{
-		if (!ft_strncmp(envp[i], "PATH=", 5))
-			return (envp[i] + 5);
-		i++;
-	}
-	return (NULL);
-}
-
-int	is_valid_command(char arg[])
-{
-	int	i;
-	int	len;
-	int	status;
-
-	i = 0;
-	while (arg[i] && arg[i] != ' ')
-		i++;
-	len = i;
-	while (arg[len])
-		len++;
-	arg[i] = '\0';
-	status = access(arg, F_OK | R_OK | X_OK) != -1;
-	if (i != len)
-		arg[i] = ' ';
-	return (status);
-}
-
-char	*check_command(char cmd[], char **paths)
-{
-	char	*cmd_name;
-	int		i;
-
-	if (is_valid_command(cmd))
-		return (ft_strdup(cmd));
-	if (paths == NULL)
-		return (NULL);
-	cmd_name = ft_strjoin("/", cmd);
-	i = 0;
-	while (paths[i])
-	{
-		cmd = ft_strjoin(paths[i], cmd_name);
-		if (is_valid_command(cmd))
-		{
-			free(cmd_name);
-			return (cmd);
-		}
-		free(cmd);
-		i++;
-	}
-	perror(&(cmd_name[1]));
-	free(cmd_name);
-	return (NULL);
-}
-
-void	check_args(t_data *data, char **argv)
-{
-	int		i;
-	char	*path_env;
-	char	**paths;
-
-	paths = NULL;
-	if (data->file_input && access(data->file_input, F_OK | R_OK) == -1)
-		quit_prog(data, NULL, data->file_input, EXIT_FAILURE);
-	if (access(data->file_output, F_OK) != -1
-		&& access(data->file_output, W_OK) == -1)
-		quit_prog(data, NULL, data->file_output, EXIT_FAILURE);
-	path_env = findpath(data->envp);
-	if (path_env)
-	{
-		paths = ft_split(path_env, ':');
-		if (!paths)
-			quit_prog(data, NULL, "check_args():ft_split()", EXIT_FAILURE);
-	}
-	data->cmds = malloc(data->nbr_cmds * sizeof(char *));
-	if (!data->cmds)
-		quit_prog(data, paths, "check_args():malloc()", EXIT_FAILURE);
-	i = 0;
-	while (i < data->nbr_cmds)
-	{
-		data->cmds[i] = check_command(argv[i], paths);
-		if (!data->cmds[i])
-		{
-			my_n_free_all(data->cmds, i);
-			quit_prog(NULL, paths, NULL, EXIT_FAILURE);
-		}
-		i++;
-	}
-	my_free_all(paths);
-}
 
 void	read_input(int pipefd[2], t_data *data)
 {

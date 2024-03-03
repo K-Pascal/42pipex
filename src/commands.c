@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/17 15:21:52 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 16:29:54 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ int	exec_prog(char **argv, char **envp)
 	{
 		if (!!ft_strncmp(argv[0], "./", 2))
 		{
-			ft_putstr_fd(argv[0], 2);
-			ft_putendl_fd(": command not found", 2);
+			ft_putstr_fd(argv[0], STDERR_FILENO);
+			ft_putendl_fd(": command not found", STDERR_FILENO);
 		}
 		else
 			perror(argv[0]);

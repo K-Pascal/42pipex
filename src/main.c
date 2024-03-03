@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/01/16 18:41:30 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/01/17 16:33:22 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc < 5)
 	{
-		ft_putstr_fd(MSG1 MSG2, 1);
+		ft_putstr_fd(MSG1 MSG2, STDOUT_FILENO);
 		return (EXIT_FAILURE);
 	}
 	start = init_data(&data, argc, argv, envp);
@@ -59,7 +59,7 @@ static int	init_data(t_data *data, int argc, char **argv, char **envp)
 	{
 		if (argc != 6)
 		{
-			ft_putendl_fd(MSG2, 2);
+			ft_putendl_fd(MSG2, STDOUT_FILENO);
 			exit(EXIT_FAILURE);
 		}
 		data->limiter = argv[2];

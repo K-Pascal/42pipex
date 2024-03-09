@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:50:06 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:34:30 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,20 @@
 
 #include "pipex.h"
 
-#define MSG "Usage: ./pipex [input file] [cmd 1] [cmd 2] [output file]\n"
+#define MSG1 "Usage: ./pipex [input file] [cmd 1] ... [cmd n] [output file]\n"
+
+#define MSG2 "Usage: ./pipex here_doc [LIMITER] [cmd 1] ... \
+[cmd n] [output file]\n"
+
 #define SIG_RETURN 128
 
 static void	init_data(t_data *data, int argc, char **argv, char **envp);
 
 int	main(int argc, char **argv, char **envp)
 {
-	if (argc != 5)
+	if (argc < 5)
 	{
-		ft_putstr_fd(MSG, STDERR_FILENO);
+		ft_putstr_fd(MSG1 MSG2, STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
 
@@ -37,21 +41,34 @@ int	main(int argc, char **argv, char **envp)
 	pipex(&data, &status);
 
 	if (WIFEXITED(status))
-		status = WEXITSTATUS(status);
+		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
-		status = SIG_RETURN + WTERMSIG(status);
+		return (SIG_RETURN + WTERMSIG(status));
 	else
-		status = EXIT_FAILURE;
-
-	return (status);
+		return (EXIT_FAILURE);
 }
 
 static void	init_data(t_data *data, int argc, char **argv, char **envp)
 {
-	data->f_in = argv[1];
-	data->limiter = NULL;
-	data->nbr_cmds = 2;
+	if (ft_strncmp(argv[1], "here_doc", 9) == 0)
+	{
+		if (argc < 6)
+		{
+			ft_putendl_fd(MSG2, STDERR_FILENO);
+			exit(EXIT_FAILURE);
+		}
+		data->limiter = argv[2];
+		data->f_in = NULL;
+		data->nbr_cmds = argc - 4;
+		data->cmds = &argv[3];
+	}
+	else
+	{
+		data->f_in = argv[1];
+		data->limiter = NULL;
+		data->nbr_cmds = argc - 3;
+		data->cmds = &argv[2];
+	}
 	data->f_out = argv[argc - 1];
-	data->cmds = &argv[2];
 	data->envp = envp;
 }

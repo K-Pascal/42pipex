@@ -16,79 +16,82 @@ GOTO_B	:=\e[1A\e[K
 DEFAULT	:=\e(B\e[m
 
 FILES		:=	commands.c		\
-				utils.c			\
 				input_output.c	\
-				pipex.c
+				pipex.c			\
+				utils.c			\
 
-MANDATORY	:=	main.c
-BONUS		:=	main_bonus.c
+MAIN_FILE	:=	main.c
 
-SRCDIR	:=	src
-SRC		:=	$(addprefix $(SRCDIR)/,$(FILES))
-SRC_M	:=	$(SRC) $(MANDATORY)
-SRC_B	:=	$(SRC) $(BONUS)
+SRC_PATH	:=	src
+SRC		:=	$(MAIN_FILE)	\
+			$(addprefix $(SRC_PATH)/,$(FILES))
 
-BUILDDIR		:=	build
-OBJ				:=	$(addprefix $(BUILDDIR)/,$(FILES:.c=.o))
-MANDATORY_OBJ	:=	$(addprefix $(BUILDDIR)/,$(MANDATORY:.c=.o))
-BONUS_OBJ		:=	$(addprefix $(BUILDDIR)/,$(BONUS:.c=.o))
-
-OBJ_M	:=	$(OBJ) $(MANDATORY_OBJ)
-OBJ_B	:=	$(OBJ) $(BONUS_OBJ)
+OBJ_PATH	:=	build
+OBJ		:=	$(addprefix $(OBJ_PATH)/,$(FILES:.c=.o))	\
+			$(addprefix $(OBJ_PATH)/,$(MAIN_FILE:.c=.o))
 
 CC		:=	cc
 CFLAGS	:=	-Wall -Wextra -Werror
 GDB		:=
 export GDB
 
-LIBFTDIR	:=	libft
-LIBFT		:=	ft
-LIBFTFILE	:=	lib$(LIBFT).a
+INC_PATH	:=	inc
+CINC		:=	-I. -I$(INC_PATH)
+
+FT_PATH	:=	libft
+FT		:=	ft
+FT_FILE	:=	lib$(FT).a
+
+LDLIBS	:=	-l$(FT)
+LDFLAGS	:=	-L$(FT_PATH)
 
 NAME		:=	pipex
-NAME_BONUS	:=	$(NAME)_bonus
 
-.PHONY: all bonus
+.PHONY: all
 all: $(NAME)
 
-bonus: $(NAME_BONUS)
-
-$(NAME): $(LIBFTDIR)/$(LIBFTFILE) $(OBJ_M)
-	@echo "Creating the executable $(BOLD)$@$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_M) -L$(LIBFTDIR) -l$(LIBFT) \
-		&& (echo "$(GOTO_B)$(GREEN)Sucessfully linked into $(BOLD)$@$(DEFAULT)")
+$(NAME): $(FT_PATH)/$(FT_FILE) $(OBJ)
+	@echo "$(ORANGE)$(ITA)Linking$(NOITA) into $(BOLD)$@$(DEFAULT)..."
+	@$(CC) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS) \
+		&& echo "$(GOTO_B)$(GREEN)Successfully $(ITA)linked$(NOITA) into $(BOLD)$@$(DEFAULT)"
 
 
-$(NAME_BONUS): $(LIBFTDIR)/$(LIBFTFILE) $(GNLDIR)/$(GNLFILE) $(OBJ_B)
-	@echo "Creating the executable $(BOLD)$@$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -o $@ $(OBJ_B) -L$(LIBFTDIR) -l$(LIBFT) \
-		&& (echo "$(GOTO_B)$(GREEN)Sucessfully linked into $(BOLD)$@$(DEFAULT)")
+$(FT_PATH)/$(FT_FILE):
+	@echo "$(ORANGE)$(ITA)Creating$(NOITA) $(BOLD)$@$(DEFAULT)..."
+	@make --silent -C $(FT_PATH) > /dev/null \
+		&& echo "$(GOTO_B)$(GREEN)Successfully $(ITA)created$(NOITA) $(BOLD)$@$(DEFAULT)"
 
-$(LIBFTDIR)/$(LIBFTFILE):
-	@echo "Creating the library $(ITALIC)$(LIBFTFILE)$(DEFAULT)"
-	@make --silent -C $(LIBFTDIR) && echo "$(GOTO_B)$(GREEN)Sucessfully created $(ITALIC)$(LIBFTFILE)$(DEFAULT)"
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
+	@echo "$(ORANGE)$(ITA)Compiling$(NOITA) $(BOLD)$<$(DEFAULT)..."
+	@$(CC) $(CFLAGS) $(GDB) $(CINC) -c $< -o $@ \
+		&& echo "$(GOTO_B)$(GREEN)Successfully $(ITA)compiled$(NOITA) $(BOLD)$<$(DEFAULT)"
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c | $(BUILDDIR)
-	@echo "$(ORANGE)Compiling $(BOLD)$<$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -c $< -o $@ && echo "$(GOTO_B)$(GREEN)Sucessfully compiled $(BOLD)$<$(DEFAULT)"
+$(OBJ_PATH)/%.o: %.c | $(OBJ_PATH)
+	@echo "$(ORANGE)$(ITA)Compiling$(NOITA) $(BOLD)$<$(DEFAULT)..."
+	@$(CC) $(CFLAGS) $(GDB) $(CINC) -c $< -o $@ \
+		&& echo "$(GOTO_B)$(GREEN)Successfully $(ITA)compiled$(NOITA) $(BOLD)$<$(DEFAULT)"
 
-$(BUILDDIR)/%.o: %.c | $(BUILDDIR)
-	@echo "$(ORANGE)Compiling $(BOLD)$<$(DEFAULT)"
-	@$(CC) $(CFLAGS) $(GDB) -I. -Iinc -c $< -o $@ && echo "$(GOTO_B)$(GREEN)Sucessfully compiled $(BOLD)$<$(DEFAULT)"
-
-$(BUILDDIR):
-	@mkdir -p $@ && echo "$(DIM)Directory $(ITALIC)$@/$(NOITA) created$(DEFAULT)"
+$(OBJ_PATH):
+	@( mkdir $@ 2> /dev/null \
+		&& echo "$(DIM)Successfully $(ITA)created$(NOITA) directory $(DEFAULT)$@/" ) \
+		|| :
 
 .PHONY: clean fclean re
 clean:
-	@make --silent -C $(LIBFTDIR) clean
-	@rm -f $(OBJ) $(MANDATORY_OBJ) $(BONUS_OBJ) && rm -rf $(BUILDDIR)\
-		&& echo "Removed $(NAME)/$(NAME_BONUS)'s object files and their directory"
-
+	@( rm -r $(OBJ_PATH) 2> /dev/null \
+		&& echo "$(PURPLE)$(ITA)Removed$(NOITA) object files and their directory$(DEFAULT)" ) \
+		|| :
 
 fclean: clean
-	@make --silent -C $(LIBFTDIR) fclean
-	@rm -f $(NAME) $(NAME_BONUS) && echo "Removed $(BOLD)$(NAME)$(BOM) and $(BOLD)$(NAME_BONUS)"
-
+	@( rm $(NAME) 2> /dev/null \
+		&& echo "$(PURPLE)$(ITA)Removed$(NOITA) executable $(NAME)$(DEFAULT)" ) \
+		|| :
 
 re: fclean all
+
+.PHONY: cleanlib
+
+cleanlib: $(FT_PATH)
+	@echo "Cleaning the library..."
+	@make --silent fclean -C $(FT_PATH) \
+		&& echo "$(GOTO_B)$(GREEN)Successfully $(ITA)cleaned$(NOITA) the library$(DEFAULT)"

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:25:12 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:35:00 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,21 +43,6 @@ void	close_pipe(int fds[2])
 	}
 }
 
-void	my_free_all(char **arr)
-{
-	if (arr == NULL)
-		return ;
-
-	int i = 0;
-	while (arr[i] != NULL)
-	{
-		free(arr[i]);
-		arr[i] = NULL;
-		i++;
-	}
-	free(arr);
-}
-
 void	my_perror(char const name[], char const msg[])
 {
 	char *error_msg = ft_strjoin(name, msg);
@@ -75,6 +60,6 @@ void	prepare_command(t_data *data, int i)
 	}
 
 	int status = exec_prog(data->cmds[i], argv, data->envp);
-	my_free_all(argv);
+	ft_free_all(argv);
 	exit(status);
 }

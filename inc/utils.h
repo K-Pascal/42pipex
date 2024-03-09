@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:11:04 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:00:49 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:34:29 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ typedef struct s_data
 
 int		redirect_pipefd(int fd, int newfd);
 void	close_pipe(int fds[2]);
-void	my_free_all(char **arr);
 void	my_perror(char const name[], char const msg[]);
 void	prepare_command(t_data *data, int i);
 #endif

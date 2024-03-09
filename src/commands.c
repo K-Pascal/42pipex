@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:24:54 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:55:21 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ int	exec_prog(char const full_cmd[], char **argv, char **envp)
 	char	*pathname = check_command(argv[0], paths, F_OK | X_OK);
 	if (pathname == NULL)
 		pathname = check_command(argv[0], paths, F_OK);
-	my_free_all(paths);
+	if (paths != NULL)
+		ft_free_all(paths);
 	if (pathname == NULL)
 	{
 		if (ft_strchr(argv[0], '/') == NULL)

@@ -6,19 +6,15 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:35:00 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:53:50 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include "libft/libft.h"
-
-#include "commands.h"
-#include "utils.h"
 
 int	redirect_pipefd(int fd, int newfd)
 {
@@ -48,18 +44,4 @@ void	my_perror(char const name[], char const msg[])
 	char *error_msg = ft_strjoin(name, msg);
 	ft_putstr_fd(error_msg, STDERR_FILENO);
 	free(error_msg);
-}
-
-void	prepare_command(t_data *data, int i)
-{
-	char **argv = ft_split(data->cmds[i], ' ');
-	if (argv == NULL)
-	{
-		perror("prepare_command():ft_split()");
-		exit(EXIT_FAILURE);
-	}
-
-	int status = exec_prog(data->cmds[i], argv, data->envp);
-	ft_free_all(argv);
-	exit(status);
 }

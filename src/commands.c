@@ -6,28 +6,44 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:55:21 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:02:16 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <errno.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "libft/libft.h"
 
+#include "pipex.h"
 #include "utils.h"
 
 #define ERR_NOT_FOUND 127
 #define ERR_ACCESS 126
 #define NOT_FOUND_MSG ": command not found\n"
 
+static int	exec_prog(char const full_cmd[], char **argv, char **envp);
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
 static char	*joinpath(char path[], char cmd[]);
 
-int	exec_prog(char const full_cmd[], char **argv, char **envp)
+void	prepare_command(t_data *data, int i)
+{
+	char **argv = ft_split(data->cmds[i], ' ');
+	if (argv == NULL)
+	{
+		perror("prepare_command():ft_split()");
+		exit(EXIT_FAILURE);
+	}
+
+	int status = exec_prog(data->cmds[i], argv, data->envp);
+	ft_free_all(argv);
+	exit(status);
+}
+
+static int	exec_prog(char const full_cmd[], char **argv, char **envp)
 {
 	if (argv[0] == NULL)
 	{
@@ -51,10 +67,10 @@ int	exec_prog(char const full_cmd[], char **argv, char **envp)
 	}
 
 	execve(pathname, argv, envp);
-	int status = errno;
+	int errsv = errno;
 	perror(pathname);
 	free(pathname);
-	return (status == EACCES ? ERR_ACCESS : EXIT_FAILURE);
+	return (errsv == EACCES ? ERR_ACCESS : EXIT_FAILURE);
 }
 
 static char	**get_path(char **envp)
@@ -62,21 +78,13 @@ static char	**get_path(char **envp)
 	if (envp == NULL)
 		return (NULL);
 
-	char	*path_env = NULL;
 	int		i = 0;
-	while (envp[i] != NULL)
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-		{
-			path_env = envp[i] + 5;
-			break ;
-		}
+	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
-	}
-	if (path_env == NULL)
+	if (envp[i] == NULL)
 		return (NULL);
 
-	char **paths = ft_split(path_env, ':');
+	char **paths = ft_split(envp[i] + 5, ':');
 	if (paths == NULL)
 		perror("getpath():ft_split()");
 

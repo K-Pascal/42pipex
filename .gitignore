@@ -4,3 +4,15 @@
 *.a
 pipex
 pipex_bonus
+outfile
+test
+*.bak
+*/
+!src/
+!libft/
+!inc/
+*.sh
+*.out
+outf
+test.c
+tags

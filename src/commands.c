@@ -6,10 +6,11 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/03 18:52:05 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:09:30 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,6 +20,8 @@
 #include "utils.h"
 
 #define ERR_CMD_NOT_FOUND 127
+#define ERR_ACCESS 126
+#define CMD_NOT_FOUND_MSG ": command not found\n"
 
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
@@ -26,6 +29,12 @@ static char	*joinpath(char path[], char cmd[]);
 
 int	exec_prog(char **argv, char **envp)
 {
+	if (argv[0] == NULL)
+	{
+		ft_putstr_fd(CMD_NOT_FOUND_MSG, STDERR_FILENO);
+		return (ERR_CMD_NOT_FOUND);
+	}
+
 	char	**paths = get_path(envp);
 	char	*pathname = check_command(argv[0], paths, F_OK | X_OK);
 	if (pathname == NULL)
@@ -33,10 +42,11 @@ int	exec_prog(char **argv, char **envp)
 	my_free_all(paths);
 	if (pathname == NULL)
 	{
-		if (ft_strncmp(argv[0], "./", 2) != 0)
+		if (ft_strchr(argv[0], '/') == NULL)
 		{
-			ft_putstr_fd(argv[0], STDERR_FILENO);
-			ft_putendl_fd(": command not found", STDERR_FILENO);
+			pathname = ft_strjoin(argv[0], CMD_NOT_FOUND_MSG);
+			ft_putstr_fd(pathname, STDERR_FILENO);
+			free(pathname);
 		}
 		else
 			perror(argv[0]);
@@ -44,9 +54,10 @@ int	exec_prog(char **argv, char **envp)
 	}
 
 	execve(pathname, argv, envp);
+	int	status = errno;
 	perror(pathname);
 	free(pathname);
-	return (EXIT_FAILURE);
+	return (status == EACCES ? ERR_ACCESS : EXIT_FAILURE);
 }
 
 static char	**get_path(char **envp)
@@ -77,10 +88,15 @@ static char	**get_path(char **envp)
 
 static char	*check_command(char cmd_name[], char **paths, int mode)
 {
-	if (access(cmd_name, mode) != -1)
-		return (ft_strdup(cmd_name));
+	if (ft_strchr(cmd_name, '/') != NULL)
+	{
+		if (access(cmd_name, mode) != -1)
+			return (ft_strdup(cmd_name));
+		else
+			return (NULL);
+	}
 
-	if (paths == NULL || ft_strncmp(cmd_name, "./", 2) == 0)
+	if (paths == NULL)
 		return (NULL);
 
 	int i = 0;
@@ -104,8 +120,9 @@ static char	*joinpath(char path[], char cmd[])
 	if (pathname == NULL)
 		return (NULL);
 
-	ft_strlcpy(pathname, path, len_path + 1);
+	ft_memcpy(pathname, path, len_path);
 	pathname[len_path] = '/';
-	ft_strlcpy(pathname + len_path + 1, cmd, len_cmd + 1);
+	ft_memcpy(pathname + len_path + 1, cmd, len_cmd);
+	pathname[len_path + 1 + len_cmd] = '\0';
 	return (pathname);
 }

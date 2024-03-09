@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/03 18:28:16 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:57:38 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 
 #include "commands.h"
 #include "utils.h"
-
-#define ERR_ACCESS 126
 
 void	redirect_pipefd(int fd, int newfd)
 {
@@ -68,15 +66,7 @@ void	prepare_command(t_data *data, int i)
 		exit(EXIT_FAILURE);
 	}
 
-	if (argv[0] == NULL)
-	{
-		my_free_all(argv);
-		exit(EXIT_SUCCESS);
-	}
-
 	int status = exec_prog(argv, data->envp);
-	if (errno == EACCES)
-		status = ERR_ACCESS;
 	my_free_all(argv);
 	exit(status);
 }

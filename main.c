@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/03 18:17:17 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:07:39 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	if (argc != 5)
 	{
-		ft_putstr_fd(MSG, STDOUT_FILENO);
+		ft_putstr_fd(MSG, STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
 

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 20:02:16 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:57:46 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static char	**get_path(char **envp)
 
 	int		i = 0;
 	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
-		i++;
+		++i;
 	if (envp[i] == NULL)
 		return (NULL);
 
@@ -111,7 +111,7 @@ static char	*check_command(char cmd_name[], char **paths, int mode)
 		if (access(cmd, mode) != -1)
 			return (cmd);
 		free(cmd);
-		i++;
+		++i;
 	}
 
 	return (NULL);

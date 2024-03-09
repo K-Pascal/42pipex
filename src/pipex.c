@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 20:03:05 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 21:00:19 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	pipex(t_data *data, int *status)
 		fpid = create_process(data, i, pipefd, fd_in);
 
 		fd_in = pipefd[0];
-		i++;
+		++i;
 	}
 
 	if (close(fd_in) == -1)
@@ -69,6 +69,7 @@ static pid_t	create_process(t_data *data, int index, int fds[2], int fd_in)
 
 	if (close(fds[1]) == -1)
 		perror("create_process():close(fds[1])");
+
 	if (fd_in != -1 && close(fd_in) == -1)
 		perror("create_process():close(fd_in)");
 
@@ -86,6 +87,7 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 			perror("pipe_exec():close(fds[1])");
 		fds[1] = open_outfile(data);
 	}
+
 	if (fds[1] == -1 || !redirect_pipefd(fds[1], STDOUT_FILENO))
 	{
 		close(fd_in);
@@ -106,6 +108,7 @@ static void	wait_all(pid_t last_process_id, int *status)
 	pid_t fpid = waitpid(-1, status, WUNTRACED);
 	while (fpid != last_process_id && errno != ECHILD)
 		fpid = waitpid(-1, status, WUNTRACED);
+
 	while (errno != ECHILD)
 		wait(NULL);
 }

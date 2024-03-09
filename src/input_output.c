@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 20:02:35 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:59:22 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,13 @@ int	open_infile(t_data *data)
 		if (fd_in == -1)
 			goto failed;
 	}
+
 	goto success;
+
 failed:
 	perror(data->f_in);
 	return (-1);
+
 success:
 	return (fd_in);
 }
@@ -67,6 +70,7 @@ int	open_outfile(t_data *data)
 failed:
 	perror(data->f_out);
 	return (-1);
+
 success:
 	return (fd_out);
 }
@@ -90,7 +94,7 @@ static int	do_heredoc(t_data *data)
 	if (fpid == 0)
 	{
 		read_input(data, pipefd);
-		return (-1);
+		exit(EXIT_SUCCESS);
 	}
 
 	if (close(pipefd[1]) == -1)

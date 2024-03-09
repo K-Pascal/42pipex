@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:09:30 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:06:01 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 
 #include "utils.h"
 
-#define ERR_CMD_NOT_FOUND 127
+#define ERR_NOT_FOUND 127
 #define ERR_ACCESS 126
-#define CMD_NOT_FOUND_MSG ": command not found\n"
+#define NOT_FOUND_MSG ": command not found\n"
 
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
@@ -31,8 +31,8 @@ int	exec_prog(char **argv, char **envp)
 {
 	if (argv[0] == NULL)
 	{
-		ft_putstr_fd(CMD_NOT_FOUND_MSG, STDERR_FILENO);
-		return (ERR_CMD_NOT_FOUND);
+		ft_putstr_fd(NOT_FOUND_MSG, STDERR_FILENO);
+		return (ERR_NOT_FOUND);
 	}
 
 	char	**paths = get_path(envp);
@@ -43,18 +43,14 @@ int	exec_prog(char **argv, char **envp)
 	if (pathname == NULL)
 	{
 		if (ft_strchr(argv[0], '/') == NULL)
-		{
-			pathname = ft_strjoin(argv[0], CMD_NOT_FOUND_MSG);
-			ft_putstr_fd(pathname, STDERR_FILENO);
-			free(pathname);
-		}
+			my_perror(argv[0], NOT_FOUND_MSG);
 		else
 			perror(argv[0]);
-		return (ERR_CMD_NOT_FOUND);
+		return (ERR_NOT_FOUND);
 	}
 
 	execve(pathname, argv, envp);
-	int	status = errno;
+	int status = errno;
 	perror(pathname);
 	free(pathname);
 	return (status == EACCES ? ERR_ACCESS : EXIT_FAILURE);

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:26:52 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:59:55 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,13 @@ void	my_free_all(char **arr)
 		i++;
 	}
 	free(arr);
+}
+
+void	my_perror(char const name[], char const msg[])
+{
+	char *error_msg = ft_strjoin(name, msg);
+	ft_putstr_fd(error_msg, STDERR_FILENO);
+	free(error_msg);
 }
 
 void	prepare_command(t_data *data, int i)

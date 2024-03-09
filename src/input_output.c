@@ -6,15 +6,15 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 19:29:00 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:02:35 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "libft/libft.h"
 

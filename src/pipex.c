@@ -6,10 +6,11 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 19:16:35 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:03:05 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -17,8 +18,9 @@
 
 #include "libft/libft.h"
 
-#include "pipex.h"
+#include "commands.h"
 #include "input_output.h"
+#include "pipex.h"
 #include "utils.h"
 
 static pid_t	create_process(t_data *data, int index, int fds[2], int fd_in);
@@ -101,9 +103,9 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 
 static void	wait_all(pid_t last_process_id, int *status)
 {
-	pid_t fpid = waitpid(0, status, WNOHANG | WUNTRACED);
-	while (fpid != last_process_id && fpid != -1)
-		fpid = waitpid(0, status, WNOHANG | WUNTRACED);
-	while (waitpid(0, NULL, WNOHANG) >= 0)
-		;
+	pid_t fpid = waitpid(-1, status, WUNTRACED);
+	while (fpid != last_process_id && errno != ECHILD)
+		fpid = waitpid(-1, status, WUNTRACED);
+	while (errno != ECHILD)
+		wait(NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:53:26 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:50:02 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "libft/libft.h"
 
-#include "process.h"
+#include "pipex.h"
 
 #define MSG1 "Usage: ./pipex_bonus [input file] [cmd 1] ... \
 [cmd n] [output file]\n"

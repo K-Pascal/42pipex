@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   first_input.c                                      :+:      :+:    :+:   */
+/*   input_output.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:17:19 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:29:00 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,14 @@
 
 #include "libft/libft.h"
 
+#include "pipex.h"
 #include "utils.h"
 
 static int	do_heredoc(t_data *data);
 static void	read_input(t_data *data, int pipefd[2]);
 static char	*ask_input(void);
 
-int	choose_input(t_data *data)
+int	open_infile(t_data *data)
 {
 	int fd_in;
 
@@ -33,20 +34,41 @@ int	choose_input(t_data *data)
 	else
 	{
 		if (access(data->f_in, F_OK | R_OK) == -1)
-		{
-			perror(data->f_in);
-			exit(EXIT_FAILURE);
-		}
+			goto failed;
 
 		fd_in = open(data->f_in, O_RDONLY);
 		if (fd_in == -1)
-		{
-			perror(data->f_in);
-			exit(EXIT_FAILURE);
-		}
+			goto failed;
 	}
-
+	goto success;
+failed:
+	perror(data->f_in);
+	return (-1);
+success:
 	return (fd_in);
+}
+
+int	open_outfile(t_data *data)
+{
+	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
+		goto failed;
+
+	int flags = O_CREAT | O_WRONLY;
+	if (data->limiter != NULL)
+		flags |= O_APPEND;
+	else
+		flags |= O_TRUNC;
+
+	int fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd_out == -1)
+		goto failed;
+
+	goto success;
+failed:
+	perror(data->f_out);
+	return (-1);
+success:
+	return (fd_out);
 }
 
 static int	do_heredoc(t_data *data)
@@ -55,7 +77,7 @@ static int	do_heredoc(t_data *data)
 	if (pipe(pipefd) == -1)
 	{
 		perror("do_heredoc():pipe()");
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
 
 	pid_t fpid = fork();
@@ -63,18 +85,18 @@ static int	do_heredoc(t_data *data)
 	{
 		perror("do_heredoc():fork()");
 		close_pipe(pipefd);
-		exit(EXIT_FAILURE);
+		return (-1);
 	}
 	if (fpid == 0)
 	{
 		read_input(data, pipefd);
-		exit(EXIT_SUCCESS);
+		return (-1);
 	}
 
 	if (close(pipefd[1]) == -1)
 		perror("do_heredoc():close()");
 
-	if (waitpid(fpid, NULL, WUNTRACED) == -1)
+	if (waitpid(fpid, NULL, 0) == -1)
 		perror("do_heredoc():waitpid()");
 
 	return (pipefd[0]);

@@ -6,11 +6,10 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:37:06 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:16:35 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -18,12 +17,12 @@
 
 #include "libft/libft.h"
 
+#include "pipex.h"
+#include "input_output.h"
 #include "utils.h"
-#include "process.h"
 
 static pid_t	create_process(t_data *data, int index, int fds[2], int fd_in);
 static void		pipe_exec(t_data *data, int i, int fds[2], int fd_in);
-static int		final_cmd(t_data *data, int fd_in);
 static void		wait_all(pid_t last_process_id, int *status);
 
 void	pipex(t_data *data, int *status)
@@ -83,45 +82,21 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 	{
 		if (close(fds[1]) == -1)
 			perror("pipe_exec():close(fds[1])");
-		fds[1] = final_cmd(data, fd_in);
+		fds[1] = open_outfile(data);
 	}
-	if (!redirect_pipefd(fds[1], STDOUT_FILENO))
+	if (fds[1] == -1 || !redirect_pipefd(fds[1], STDOUT_FILENO))
 	{
 		close(fd_in);
 		exit(EXIT_FAILURE);
 	}
 
 	if (index == 0)
-		fd_in = choose_input(data);
-	if (!redirect_pipefd(fd_in, STDIN_FILENO))
+		fd_in = open_infile(data);
+
+	if (fd_in == -1 || !redirect_pipefd(fd_in, STDIN_FILENO))
 		exit(EXIT_FAILURE);
 
 	prepare_command(data, index);
-}
-
-static int	final_cmd(t_data *data, int fd_in)
-{
-	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
-	{
-		perror(data->f_out);
-		close(fd_in);
-		exit(EXIT_FAILURE);
-	}
-
-	int flags = O_CREAT | O_WRONLY;
-	if (data->limiter != NULL)
-		flags |= O_APPEND;
-	else
-		flags |= O_TRUNC;
-	int fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-	if (fd_out == -1)
-	{
-		perror(data->f_out);
-		close(fd_in);
-		exit(EXIT_FAILURE);
-	}
-
-	return (fd_out);
 }
 
 static void	wait_all(pid_t last_process_id, int *status)

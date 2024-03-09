@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 16:13:44 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:07:39 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:50:06 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "libft/libft.h"
 
-#include "process.h"
+#include "pipex.h"
 
 #define MSG "Usage: ./pipex [input file] [cmd 1] [cmd 2] [output file]\n"
 #define SIG_RETURN 128

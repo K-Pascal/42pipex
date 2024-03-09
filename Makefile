@@ -17,7 +17,7 @@ DEFAULT	:=\e(B\e[m
 
 FILES		:=	commands.c		\
 				utils.c			\
-				first_input.c	\
+				input_output.c	\
 				pipex.c
 
 MANDATORY	:=	main.c

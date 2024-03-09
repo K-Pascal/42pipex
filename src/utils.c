@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 17:59:55 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:25:12 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	prepare_command(t_data *data, int i)
 		exit(EXIT_FAILURE);
 	}
 
-	int status = exec_prog(argv, data->envp);
+	int status = exec_prog(data->cmds[i], argv, data->envp);
 	my_free_all(argv);
 	exit(status);
 }

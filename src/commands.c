@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 18:06:01 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:24:54 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
 static char	*joinpath(char path[], char cmd[]);
 
-int	exec_prog(char **argv, char **envp)
+int	exec_prog(char const full_cmd[], char **argv, char **envp)
 {
 	if (argv[0] == NULL)
 	{
-		ft_putstr_fd(NOT_FOUND_MSG, STDERR_FILENO);
+		my_perror(full_cmd, NOT_FOUND_MSG);
 		return (ERR_NOT_FOUND);
 	}
 

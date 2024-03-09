@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:58:56 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/03 18:26:16 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:37:06 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,11 +85,16 @@ static void	pipe_exec(t_data *data, int index, int fds[2], int fd_in)
 			perror("pipe_exec():close(fds[1])");
 		fds[1] = final_cmd(data, fd_in);
 	}
-	redirect_pipefd(fds[1], STDOUT_FILENO);
+	if (!redirect_pipefd(fds[1], STDOUT_FILENO))
+	{
+		close(fd_in);
+		exit(EXIT_FAILURE);
+	}
 
 	if (index == 0)
 		fd_in = choose_input(data);
-	redirect_pipefd(fd_in, STDIN_FILENO);
+	if (!redirect_pipefd(fd_in, STDIN_FILENO))
+		exit(EXIT_FAILURE);
 
 	prepare_command(data, index);
 }

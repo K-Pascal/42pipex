@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 16:57:38 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:26:52 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,18 @@
 #include "commands.h"
 #include "utils.h"
 
-void	redirect_pipefd(int fd, int newfd)
+int	redirect_pipefd(int fd, int newfd)
 {
 	if (dup2(fd, newfd) == -1)
 	{
 		perror("redirect_pipefd():dup2()");
 		close(fd);
-		exit(EXIT_FAILURE);
+		return (0);
 	}
 
 	if (close(fd) == -1)
 		perror("redirect_pipefd():close()");
+	return (1);
 }
 
 void	close_pipe(int fds[2])

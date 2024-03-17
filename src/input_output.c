@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/17 17:39:30 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:58:14 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,6 @@ static void	read_input(t_data *data, int pipefd[2])
 
 static char	*ask_input(void)
 {
-	ft_putstr_fd("> ", STDIN_FILENO);
+	ft_putstr_fd("> ", STDERR_FILENO);
 	return (get_next_line(STDIN_FILENO));
 }

@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/17 18:07:33 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 18:08:35 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,8 @@ int	redirect_pipefd(int fd, int newfd)
 
 void	close_pipe(int fds[2])
 {
-	if (fds != NULL)
-	{
-		close(fds[0]);
-		close(fds[1]);
-	}
+	close(fds[0]);
+	close(fds[1]);
 }
 
 void	my_perror(char const name[], char const msg[])

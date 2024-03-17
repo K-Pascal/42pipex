@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/17 17:36:27 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:39:30 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,10 +120,18 @@ static void	read_input(t_data *data, int pipefd[2])
 	if (input == NULL)
 	{
 		char	*delim = ft_strjoin(data->limiter, "')\n");
-		char	*wanted = ft_strjoin("(wanted '", delim);
-		my_perror("\nwarning: here-document delimited by end-of-file ", wanted);
-		free(wanted);
-		free(delim);
+		if (delim != NULL)
+		{
+			char	*wanted = ft_strjoin("(wanted '", delim);
+			free(delim);
+			if (wanted != NULL)
+				my_perror("\nwarning: here-document delimited by end-of-file ", wanted);
+			else
+				perror("read_input():ft_strjoin(data->limiter)");
+			free(wanted);
+		}
+		else
+			perror("read_input():ft_strjoin(data->limiter)");
 	}
 	free(input);
 

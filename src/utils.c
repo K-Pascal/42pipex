@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 16:08:55 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 19:53:50 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 18:07:33 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,11 @@ void	close_pipe(int fds[2])
 void	my_perror(char const name[], char const msg[])
 {
 	char *error_msg = ft_strjoin(name, msg);
+	if (error_msg == NULL)
+	{
+		perror("my_perror():ft_strjoin()");
+		return ;
+	}
 	ft_putstr_fd(error_msg, STDERR_FILENO);
 	free(error_msg);
 }

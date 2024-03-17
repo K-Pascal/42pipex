@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/05 15:58:36 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 20:57:46 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:55:57 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 static int	exec_prog(char const full_cmd[], char **argv, char **envp);
 static char	**get_path(char **envp);
 static char	*check_command(char cmd[], char **paths, int mode);
-static char	*joinpath(char path[], char cmd[]);
+static char	*join_path(char path[], char cmd[]);
 
 void	prepare_command(t_data *data, int i)
 {
@@ -59,10 +59,10 @@ static int	exec_prog(char const full_cmd[], char **argv, char **envp)
 		ft_free_all(paths);
 	if (pathname == NULL)
 	{
-		if (ft_strchr(argv[0], '/') == NULL)
-			my_perror(argv[0], NOT_FOUND_MSG);
-		else
+		if (ft_strchr(argv[0], '/') != NULL)
 			perror(argv[0]);
+		else
+			my_perror(argv[0], NOT_FOUND_MSG);
 		return (ERR_NOT_FOUND);
 	}
 
@@ -86,7 +86,7 @@ static char	**get_path(char **envp)
 
 	char **paths = ft_split(envp[i] + 5, ':');
 	if (paths == NULL)
-		perror("getpath():ft_split()");
+		perror("get_path():ft_split()");
 
 	return (paths);
 }
@@ -107,7 +107,9 @@ static char	*check_command(char cmd_name[], char **paths, int mode)
 	int i = 0;
 	while (paths[i] != NULL)
 	{
-		char *cmd = joinpath(paths[i], cmd_name);
+		char *cmd = join_path(paths[i], cmd_name);
+		if (cmd == NULL)
+			return (NULL);
 		if (access(cmd, mode) != -1)
 			return (cmd);
 		free(cmd);
@@ -117,13 +119,16 @@ static char	*check_command(char cmd_name[], char **paths, int mode)
 	return (NULL);
 }
 
-static char	*joinpath(char path[], char cmd[])
+static char	*join_path(char path[], char cmd[])
 {
 	size_t	len_path = ft_strlen(path);
 	size_t	len_cmd = ft_strlen(cmd);
 	char	*pathname = malloc((len_path + len_cmd + 2) * sizeof(char));
 	if (pathname == NULL)
+	{
+		perror("join_path():malloc()");
 		return (NULL);
+	}
 
 	ft_memcpy(pathname, path, len_path);
 	pathname[len_path] = '/';

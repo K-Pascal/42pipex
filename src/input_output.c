@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/09 20:59:22 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:36:27 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,14 @@ int	open_infile(t_data *data)
 		fd_in = do_heredoc(data);
 	else
 	{
-		if (access(data->f_in, F_OK | R_OK) == -1)
-			goto failed;
-
 		fd_in = open(data->f_in, O_RDONLY);
 		if (fd_in == -1)
-			goto failed;
+			goto fail;
 	}
 
 	goto success;
 
-failed:
+fail:
 	perror(data->f_in);
 	return (-1);
 
@@ -53,9 +50,6 @@ success:
 
 int	open_outfile(t_data *data)
 {
-	if (access(data->f_out, F_OK) != -1 && access(data->f_out, W_OK) == -1)
-		goto failed;
-
 	int flags = O_CREAT | O_WRONLY;
 	if (data->limiter != NULL)
 		flags |= O_APPEND;
@@ -64,10 +58,10 @@ int	open_outfile(t_data *data)
 
 	int fd_out = open(data->f_out, flags, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd_out == -1)
-		goto failed;
+		goto fail;
 
 	goto success;
-failed:
+fail:
 	perror(data->f_out);
 	return (-1);
 

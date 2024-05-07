@@ -6,7 +6,7 @@
 /*   By: pnguyen- <pnguyen-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 14:44:22 by pnguyen-          #+#    #+#             */
-/*   Updated: 2024/03/17 17:58:14 by pnguyen-         ###   ########.fr       */
+/*   Updated: 2024/05/07 17:57:18 by pnguyen-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,11 @@ int	open_infile(t_data *data)
 			goto fail;
 	}
 
-	goto success;
+	return (fd_in);
 
 fail:
 	perror(data->f_in);
 	return (-1);
-
-success:
-	return (fd_in);
 }
 
 int	open_outfile(t_data *data)
@@ -60,13 +57,11 @@ int	open_outfile(t_data *data)
 	if (fd_out == -1)
 		goto fail;
 
-	goto success;
+	return (fd_out);
+
 fail:
 	perror(data->f_out);
 	return (-1);
-
-success:
-	return (fd_out);
 }
 
 static int	do_heredoc(t_data *data)

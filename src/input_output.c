@@ -21,6 +21,8 @@
 #include "pipex.h"
 #include "utils.h"
 
+#define HERE_DOC_NULL_MSG "\nwarning: here-document delimited by end-of-file "
+
 static int	do_heredoc(t_data *data);
 static void	read_input(t_data *data, int pipefd[2]);
 static char	*ask_input(void);
@@ -114,19 +116,10 @@ static void	read_input(t_data *data, int pipefd[2])
 	}
 	if (input == NULL)
 	{
-		char	*delim = ft_strjoin(data->limiter, "')\n");
-		if (delim != NULL)
-		{
-			char	*wanted = ft_strjoin("(wanted '", delim);
-			free(delim);
-			if (wanted != NULL)
-				my_perror("\nwarning: here-document delimited by end-of-file ", wanted);
-			else
-				perror("read_input():ft_strjoin(data->limiter)");
-			free(wanted);
-		}
-		else
-			perror("read_input():ft_strjoin(data->limiter)");
+		write(STDERR_FILENO, HERE_DOC_NULL_MSG, ft_strlen(HERE_DOC_NULL_MSG));
+		write(STDERR_FILENO, "(wanted '", 9);
+		write(STDERR_FILENO, data->limiter, len_limiter);
+		write(STDERR_FILENO, "')\n", 3);
 	}
 	free(input);
 
